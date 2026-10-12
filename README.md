@@ -1,15 +1,12 @@
-<p align="center">
-  <img src="screenshots/hookdeck_banner.jpg" alt="HookDeck Webhook Sender Hero Banner" width="100%" style="border-radius: 18px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);" />
-</p>
+
 
 # HookDeck: Webhook Sender
 
 <p align="center">
   <b>A streamlined mobile & web workstation for dispatching messages, media, and binary file attachments through webhooks in 1–2 taps.</b>
 </p>
-
 <p align="center">
-  <img src="screenshots/01_hookdeck_profiles_l.png" alt="HookDeck Hero Showcase" width="380" style="border-radius: 20px;" />
+  <img src="screenshots/hookdeck_banner.jpg" alt="HookDeck Webhook Sender Hero Banner" width="100%" style="border-radius: 18px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);" />
 </p>
 
 <p align="center">
