@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
@@ -78,8 +79,10 @@ class WebhookService {
             ),
           );
 
-          final streamedResponse = await request.send().timeout(const Duration(seconds: 15));
-          final response = await http.Response.fromStream(streamedResponse);
+          request.headers['User-Agent'] = 'HookDeckClient (1.0)';
+
+          final streamedResponse = await request.send().timeout(const Duration(seconds: 90));
+          final response = await http.Response.fromStream(streamedResponse).timeout(const Duration(seconds: 45));
           stopwatch.stop();
 
           final isSuccess = response.statusCode >= 200 && response.statusCode < 300;
@@ -108,10 +111,13 @@ class WebhookService {
           final response = await http
               .post(
                 uri,
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                  'Content-Type': 'application/json',
+                  'User-Agent': 'HookDeckClient (1.0)',
+                },
                 body: json.encode(payload),
               )
-              .timeout(const Duration(seconds: 10));
+              .timeout(const Duration(seconds: 25));
 
           stopwatch.stop();
           final isSuccess = response.statusCode >= 200 && response.statusCode < 300;
@@ -147,7 +153,7 @@ class WebhookService {
               headers: {'Content-Type': 'application/json'},
               body: json.encode(payload),
             )
-            .timeout(const Duration(seconds: 10));
+            .timeout(const Duration(seconds: 30));
 
         stopwatch.stop();
         final isSuccess = response.statusCode >= 200 && response.statusCode < 300;
@@ -163,6 +169,7 @@ class WebhookService {
       // 3. GENERIC HTTP WEBHOOK
       if (attachmentBytes != null && attachmentBytes.isNotEmpty) {
         final request = http.MultipartRequest('POST', uri);
+        request.headers['User-Agent'] = 'HookDeckClient (1.0)';
         request.fields['message'] = message;
         request.fields['profile_id'] = profile.id;
         request.fields['profile_name'] = profile.displayName;
@@ -177,8 +184,8 @@ class WebhookService {
             filename: attachmentName ?? 'file',
           ),
         );
-        final streamed = await request.send().timeout(const Duration(seconds: 15));
-        final response = await http.Response.fromStream(streamed);
+        final streamed = await request.send().timeout(const Duration(seconds: 90));
+        final response = await http.Response.fromStream(streamed).timeout(const Duration(seconds: 45));
         stopwatch.stop();
         final isSuccess = response.statusCode >= 200 && response.statusCode < 300;
         return DispatchResult(
@@ -207,7 +214,7 @@ class WebhookService {
               headers: {'Content-Type': 'application/json'},
               body: json.encode(payload),
             )
-            .timeout(const Duration(seconds: 10));
+            .timeout(const Duration(seconds: 30));
 
         stopwatch.stop();
         final isSuccess = response.statusCode >= 200 && response.statusCode < 300;
@@ -221,11 +228,17 @@ class WebhookService {
       }
     } catch (e) {
       stopwatch.stop();
+      String errorMsg;
+      if (e is TimeoutException) {
+        errorMsg = 'Upload timed out. If your attachment is large, please check your network connection.';
+      } else {
+        errorMsg = 'Connection error: ${e.toString()}';
+      }
       return DispatchResult(
         isSuccess: false,
-        statusCode: 0,
+        statusCode: e is TimeoutException ? 408 : 0,
         latencyMs: stopwatch.elapsedMilliseconds,
-        errorMessage: 'Connection failed: ${e.toString()}',
+        errorMessage: errorMsg,
         responseBody: '',
       );
     }

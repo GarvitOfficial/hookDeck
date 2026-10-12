@@ -820,7 +820,9 @@ class _SendScreenState extends State<SendScreen> {
 
                 // 5. Send Webhook Button
                 LuxuryButton(
-                  text: 'Dispatch Webhook',
+                  text: _isSending
+                      ? (_attachedFileName != null ? 'Uploading & Dispatching...' : 'Dispatching...')
+                      : 'Dispatch Webhook',
                   icon: Icons.send_rounded,
                   isLoading: _isSending,
                   onPressed: _handleSend,
