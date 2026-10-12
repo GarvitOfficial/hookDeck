@@ -49,13 +49,28 @@ class ProfileDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Identity Profile',
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: primaryText,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 22,
+                height: 22,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Identity Profile',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: primaryText,
+              ),
+            ),
+          ],
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),

@@ -148,13 +148,10 @@ class ProfilesHomeScreen extends StatelessWidget {
                     color: primaryAccent,
                   ),
                   child: const Center(
-                    child: Text(
-                      'H',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
+                    child: Icon(
+                      Icons.shield_outlined,
+                      color: Colors.white,
+                      size: 16,
                     ),
                   ),
                 ),

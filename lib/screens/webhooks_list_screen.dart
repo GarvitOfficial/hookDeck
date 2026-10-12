@@ -77,13 +77,28 @@ class _WebhooksListScreenState extends State<WebhooksListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Destinations',
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: primaryText,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 22,
+                height: 22,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Destinations',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: primaryText,
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(

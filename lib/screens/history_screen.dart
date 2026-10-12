@@ -25,13 +25,28 @@ class HistoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Dispatch History',
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: primaryText,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 22,
+                height: 22,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Dispatch History',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: primaryText,
+              ),
+            ),
+          ],
         ),
         actions: [
           if (history.isNotEmpty)

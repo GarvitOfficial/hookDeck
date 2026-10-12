@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,20 +35,14 @@ class SendScreen extends StatefulWidget {
 class _SendScreenState extends State<SendScreen> {
   late Profile? _selectedProfile;
   late WebhookTarget? _selectedWebhook;
-  final TextEditingController _messageController = TextEditingController(
-    text: 'Deployment verified in production • 4 checks passed, 0 errors.',
-  );
+  final TextEditingController _messageController = TextEditingController();
 
-  String? _attachedFileName = 'build_summary.pdf (1.2 MB)';
+  // Attachments are optional and null by default
+  String? _attachedFileName;
+  Uint8List? _attachedFileBytes;
+  int? _attachedFileSize;
   bool _silentDelivery = false;
   bool _isSending = false;
-
-  final List<String> _sampleAttachments = [
-    'build_summary.pdf (1.2 MB)',
-    'release_notes.md (14 KB)',
-    'telemetry_snapshot.json (48 KB)',
-    'audit_report.csv (2.4 MB)',
-  ];
 
   @override
   void initState() {
@@ -285,61 +280,33 @@ class _SendScreenState extends State<SendScreen> {
     );
   }
 
-  void _showAttachmentPicker() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryText = isDark ? const Color(0xFFF7F5F2) : const Color(0xFF1C1917);
-    final primaryAccent = isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown;
+  // Real device file picker complying with Google Play Console policies
+  Future<void> _pickRealAttachment() async {
+    HapticFeedback.lightImpact();
+    try {
+      final files = await FilePicker.pickFiles(type: FileType.any);
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF141311) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            border: Border.all(
-              color: isDark ? const Color(0xFF2A2824) : const Color(0xFFE8E4DC),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Attach Sample File',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: primaryText,
-                ),
-              ),
-              const SizedBox(height: 14),
-              ..._sampleAttachments.map((filename) {
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(Icons.insert_drive_file_outlined, color: primaryAccent, size: 20),
-                  title: Text(
-                    filename,
-                    style: GoogleFonts.jetBrainsMono(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: primaryText,
-                    ),
-                  ),
-                  onTap: () {
-                    setState(() => _attachedFileName = filename);
-                    Navigator.pop(context);
-                    HapticFeedback.lightImpact();
-                  },
-                );
-              }),
-            ],
+      if (files.isNotEmpty) {
+        final file = files.first;
+        final bytes = await file.readAsBytes();
+        final size = await file.length() ?? bytes.length;
+
+        setState(() {
+          _attachedFileName = file.name;
+          _attachedFileBytes = bytes;
+          _attachedFileSize = size;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not open file: $e', style: GoogleFonts.plusJakartaSans()),
+            backgroundColor: const Color(0xFF1C1917),
           ),
         );
-      },
-    );
+      }
+    }
   }
 
   Future<void> _handleSend() async {
@@ -382,6 +349,7 @@ class _SendScreenState extends State<SendScreen> {
       target: _selectedWebhook!,
       message: message,
       attachmentName: _attachedFileName,
+      attachmentBytes: _attachedFileBytes,
       silent: _silentDelivery,
     );
 
@@ -398,7 +366,11 @@ class _SendScreenState extends State<SendScreen> {
         targetTitle: _selectedWebhook!.title,
         targetPlatform: _selectedWebhook!.platform,
         message: message,
-        attachmentName: _attachedFileName,
+        attachmentName: _attachedFileName != null
+            ? (_attachedFileSize != null
+                ? '$_attachedFileName (${(_attachedFileSize! / 1024).toStringAsFixed(1)} KB)'
+                : _attachedFileName)
+            : null,
         isSuccess: true,
         statusCode: result.statusCode,
         latencyMs: result.latencyMs,
@@ -446,13 +418,28 @@ class _SendScreenState extends State<SendScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Dispatch Message',
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: primaryText,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 22,
+                height: 22,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Dispatch Message',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: primaryText,
+              ),
+            ),
+          ],
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
@@ -633,7 +620,7 @@ class _SendScreenState extends State<SendScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // 3. Attach File Section
+                // 3. Attach File Section (Clean, Real Picker, No Hardcoded Presets)
                 LuxuryGlassCard(
                   padding: const EdgeInsets.all(16),
                   borderRadius: 16,
@@ -644,7 +631,7 @@ class _SendScreenState extends State<SendScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'ATTACHMENT',
+                            'ATTACHMENT (OPTIONAL)',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -653,7 +640,7 @@ class _SendScreenState extends State<SendScreen> {
                             ),
                           ),
                           Text(
-                            'Up to 25MB',
+                            'Discord & Slack native',
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               color: secondaryText,
@@ -664,43 +651,67 @@ class _SendScreenState extends State<SendScreen> {
                       const SizedBox(height: 10),
                       if (_attachedFileName != null)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           decoration: BoxDecoration(
                             color: isDark ? const Color(0xFF1C1A17) : const Color(0xFFF3ECE4),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: borderColor),
                           ),
                           child: Row(
                             children: [
                               Icon(
                                 Icons.insert_drive_file_outlined,
-                                size: 16,
+                                size: 20,
                                 color: primaryAccent,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 10),
                               Expanded(
-                                child: Text(
-                                  _attachedFileName!,
-                                  style: GoogleFonts.jetBrainsMono(
-                                    fontSize: 12,
-                                    color: primaryText,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      _attachedFileName!,
+                                      style: GoogleFonts.jetBrainsMono(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: primaryText,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    if (_attachedFileSize != null)
+                                      Text(
+                                        _attachedFileSize! > 1024 * 1024
+                                            ? '${(_attachedFileSize! / (1024 * 1024)).toStringAsFixed(2)} MB'
+                                            : '${(_attachedFileSize! / 1024).toStringAsFixed(1)} KB',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 10,
+                                          color: secondaryText,
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                               InkWell(
-                                onTap: () => setState(() => _attachedFileName = null),
-                                child: Icon(Icons.close_rounded, size: 16, color: secondaryText),
+                                onTap: () => setState(() {
+                                  _attachedFileName = null;
+                                  _attachedFileBytes = null;
+                                  _attachedFileSize = null;
+                                }),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Icon(Icons.close_rounded, size: 18, color: secondaryText),
+                                ),
                               ),
                             ],
                           ),
                         )
                       else
                         OutlinedButton.icon(
-                          onPressed: _showAttachmentPicker,
+                          onPressed: _pickRealAttachment,
                           icon: Icon(Icons.attach_file_rounded, size: 16, color: primaryAccent),
                           label: Text(
-                            'Attach File Sample',
+                            'Attach File, Photo, or Log',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               color: primaryAccent,

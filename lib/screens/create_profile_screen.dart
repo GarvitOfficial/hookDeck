@@ -33,6 +33,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   bool _isSaving = false;
 
   final List<Map<String, String>> _luxuryTones = [
+    {'id': 'brand', 'name': 'HookDeck Crest', 'hex': '#C59B6D'},
     {'id': 'brown', 'name': 'Saddle Brown', 'hex': '#8C5E38'},
     {'id': 'espresso', 'name': 'Espresso Noir', 'hex': '#262320'},
     {'id': 'champagne', 'name': 'Bronze Gold', 'hex': '#C59B6D'},
@@ -144,13 +145,28 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          isEditing ? 'Edit Profile' : 'New Profile',
-          style: GoogleFonts.plusJakartaSans(
-            fontWeight: FontWeight.w600,
-            fontSize: 17,
-            color: primaryText,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 22,
+                height: 22,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              isEditing ? 'Edit Profile' : 'New Profile',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w600,
+                fontSize: 17,
+                color: primaryText,
+              ),
+            ),
+          ],
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),

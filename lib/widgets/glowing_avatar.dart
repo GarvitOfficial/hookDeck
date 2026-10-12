@@ -80,6 +80,23 @@ class GlowingAvatar extends StatelessWidget {
           return _buildInitialsFallback(fallbackColor);
         },
       );
+    } else if (avatarValue == 'brand' ||
+        avatarValue == 'logo' ||
+        avatarValue == 'hookdeck' ||
+        initials == 'H' ||
+        initials == 'HD') {
+      innerContent = ClipRRect(
+        borderRadius: BorderRadius.circular(size / 2),
+        child: Image.asset(
+          'assets/images/logo.png',
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildInitialsFallback(fallbackColor);
+          },
+        ),
+      );
     } else {
       innerContent = _buildInitialsFallback(fallbackColor);
     }
