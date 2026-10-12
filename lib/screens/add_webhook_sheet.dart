@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../models/webhook_target.dart';
 import '../services/storage_service.dart';
 import '../services/webhook_service.dart';
+import '../theme/app_theme.dart';
 import '../widgets/luxury_button.dart';
 import '../widgets/destination_chip.dart';
 
@@ -33,7 +34,7 @@ class _AddWebhookSheetState extends State<AddWebhookSheet> {
   String? _testStatusMessage;
   bool? _testSuccess;
 
-  final List<String> _platforms = ['discord', 'slack', 'telegram', 'generic'];
+  final List<String> _platforms = ['discord', 'slack', 'generic'];
 
   @override
   void initState() {
@@ -106,8 +107,8 @@ class _AddWebhookSheetState extends State<AddWebhookSheet> {
         _isTesting = false;
         _testSuccess = result.isSuccess;
         _testStatusMessage = result.isSuccess
-            ? '✓ Test ping succeeded (${result.latencyMs}ms)'
-            : '✕ Could not reach endpoint (${result.errorMessage ?? "Code ${result.statusCode}"})';
+            ? '✓ Verified reachable (${result.latencyMs}ms)'
+            : '✕ Endpoint error (${result.errorMessage ?? "Code ${result.statusCode}"})';
       });
     }
   }
@@ -142,8 +143,8 @@ class _AddWebhookSheetState extends State<AddWebhookSheet> {
       Navigator.pop(context, target);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Connected webhook "${target.title}" ✓'),
-          backgroundColor: const Color(0xFF10B981),
+          content: Text('Connected "${target.title}"', style: GoogleFonts.plusJakartaSans()),
+          backgroundColor: const Color(0xFF1C1917),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -153,23 +154,17 @@ class _AddWebhookSheetState extends State<AddWebhookSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryText = isDark ? const Color(0xFFF7F5F2) : const Color(0xFF1C1917);
+    final secondaryText = isDark ? const Color(0xFFA8A29E) : const Color(0xFF78716C);
+    final primaryAccent = isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown;
+    final borderColor = isDark ? const Color(0xFF2A2824) : const Color(0xFFE8E4DC);
+    final inputFill = isDark ? const Color(0xFF141311) : Colors.white;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF10131E) : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        border: Border.all(
-          color: isDark
-              ? const Color(0xFF8B5CF6).withValues(alpha: 0.3)
-              : Colors.black.withValues(alpha: 0.08),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
-            blurRadius: 32,
-            offset: const Offset(0, -4),
-          ),
-        ],
+        color: isDark ? const Color(0xFF171614) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        border: Border.all(color: borderColor),
       ),
       padding: EdgeInsets.only(
         left: 20,
@@ -184,146 +179,96 @@ class _AddWebhookSheetState extends State<AddWebhookSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Drag pill handle
               Center(
                 child: Container(
-                  width: 44,
+                  width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.35),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
 
-              // Sheet Header
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.add_link_rounded,
-                      size: 20,
-                      color: Color(0xFF8B5CF6),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.existingWebhook != null ? 'Edit Webhook' : 'Add New Webhook',
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
-                          ),
-                        ),
-                        Text(
-                          'Connect Discord, Slack, or generic HTTP destination',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Platform Type Row
+              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'PLATFORM TYPE',
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 11,
+                    widget.existingWebhook != null ? 'Edit Destination' : 'Add Destination',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF06B6D4),
-                      letterSpacing: 0.8,
+                      color: primaryText,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF06B6D4).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      'Auto-detects URL format',
-                      style: GoogleFonts.jetBrainsMono(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF06B6D4),
-                      ),
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: _platforms.map((platform) {
-                    final isSelected = platform == _selectedPlatform;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: DestinationChip(
-                        platform: platform,
-                        isSelected: isSelected,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          setState(() => _selectedPlatform = platform);
-                        },
-                      ),
-                    );
-                  }).toList(),
+              const SizedBox(height: 16),
+
+              // Platform selection
+              Text(
+                'Platform Type',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: primaryText,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 8),
+              Row(
+                children: _platforms.map((platform) {
+                  final isSelected = platform == _selectedPlatform;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: DestinationChip(
+                      platform: platform,
+                      isSelected: isSelected,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        setState(() => _selectedPlatform = platform);
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 18),
 
-              // Webhook Name / Title
+              // Name
               Text(
-                'Webhook Name / Channel Title',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                'Destination Label',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: primaryText,
                 ),
               ),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _titleController,
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                ),
+                style: GoogleFonts.plusJakartaSans(fontSize: 13, color: primaryText),
                 decoration: InputDecoration(
-                  hintText: 'e.g. Team Announcements, Prod Alerts',
-                  hintStyle: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                  ),
-                  prefixIcon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
+                  hintText: 'e.g. Production Alerts',
+                  hintStyle: GoogleFonts.inter(fontSize: 12, color: secondaryText.withValues(alpha: 0.6)),
                   filled: true,
-                  fillColor: isDark
-                      ? const Color(0xFF0A0D18).withValues(alpha: 0.6)
-                      : Colors.black.withValues(alpha: 0.03),
+                  fillColor: inputFill,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: borderColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: borderColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: primaryAccent, width: 1.5),
                   ),
                 ),
                 validator: (val) {
@@ -333,39 +278,27 @@ class _AddWebhookSheetState extends State<AddWebhookSheet> {
                   return null;
                 },
               ),
-              const SizedBox(height: 4),
-              Text(
-                'Give it a friendly name so you can find it easily.',
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                ),
-              ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
 
-              // Webhook URL Field with Paste Button
+              // Webhook URL
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Webhook URL',
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: primaryText,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
+                  InkWell(
+                    onTap: _pasteFromClipboard,
                     child: Text(
-                      'HTTPS TLS 1.3',
-                      style: GoogleFonts.jetBrainsMono(
-                        fontSize: 9,
-                        color: Colors.green,
+                      'Paste from clipboard',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        color: primaryAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -375,35 +308,25 @@ class _AddWebhookSheetState extends State<AddWebhookSheet> {
               const SizedBox(height: 6),
               TextFormField(
                 controller: _urlController,
-                style: GoogleFonts.jetBrainsMono(
-                  fontSize: 13,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                ),
+                maxLines: 2,
+                style: GoogleFonts.jetBrainsMono(fontSize: 11, color: primaryText),
                 decoration: InputDecoration(
                   hintText: 'https://discord.com/api/webhooks/...',
-                  hintStyle: GoogleFonts.jetBrainsMono(
-                    fontSize: 11,
-                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                  ),
-                  prefixIcon: const Icon(Icons.link_rounded, size: 20),
-                  suffixIcon: TextButton.icon(
-                    onPressed: _pasteFromClipboard,
-                    icon: const Icon(Icons.paste_rounded, size: 14),
-                    label: const Text('Paste'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFF8B5CF6),
-                      textStyle: GoogleFonts.spaceGrotesk(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
+                  hintStyle: GoogleFonts.jetBrainsMono(fontSize: 11, color: secondaryText.withValues(alpha: 0.6)),
                   filled: true,
-                  fillColor: isDark
-                      ? const Color(0xFF0A0D18).withValues(alpha: 0.6)
-                      : Colors.black.withValues(alpha: 0.03),
+                  fillColor: inputFill,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: borderColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: borderColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: primaryAccent, width: 1.5),
                   ),
                 ),
                 validator: (val) {
@@ -411,123 +334,86 @@ class _AddWebhookSheetState extends State<AddWebhookSheet> {
                     return 'Please enter a webhook URL';
                   }
                   if (!val.trim().startsWith('http://') && !val.trim().startsWith('https://')) {
-                    return 'URL must start with http:// or https://';
+                    return 'Must start with http:// or https://';
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // Favorite toggle & Test Ping
+              // Test Ping Button
+              Row(
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: _isTesting ? null : _runTestPing,
+                    icon: _isTesting
+                        ? SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(strokeWidth: 1.5, color: primaryAccent),
+                          )
+                        : Icon(Icons.bolt_rounded, size: 14, color: primaryAccent),
+                    label: Text(
+                      _isTesting ? 'Testing...' : 'Test Ping',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: primaryAccent,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: borderColor),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                  if (_testStatusMessage != null) ...[
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _testStatusMessage!,
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 10,
+                          color: _testSuccess == true ? AppTheme.successGreen : AppTheme.subtleError,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              // Star as favorite
               Row(
                 children: [
                   Icon(
                     _isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
-                    color: _isFavorite ? const Color(0xFFF59E0B) : Colors.grey,
+                    size: 18,
+                    color: _isFavorite ? primaryAccent : secondaryText,
                   ),
                   const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Mark as Favorite',
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
-                          ),
-                        ),
-                        Text(
-                          'Pins to quick destination list',
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                          ),
-                        ),
-                      ],
+                  Text(
+                    'Mark as Primary Destination',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12,
+                      color: primaryText,
                     ),
                   ),
+                  const Spacer(),
                   Switch(
                     value: _isFavorite,
-                    activeThumbColor: const Color(0xFF8B5CF6),
-                    onChanged: (val) {
-                      setState(() => _isFavorite = val);
-                    },
+                    activeThumbColor: primaryAccent,
+                    onChanged: (val) => setState(() => _isFavorite = val),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
 
-              // Test Ping Button
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.04)
-                      : Colors.black.withValues(alpha: 0.03),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: isDark ? Colors.white10 : Colors.black12,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Connection Diagnostic',
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
-                            ),
-                          ),
-                          if (_testStatusMessage != null) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              _testStatusMessage!,
-                              style: GoogleFonts.jetBrainsMono(
-                                fontSize: 11,
-                                color: _testSuccess == true
-                                    ? const Color(0xFF10B981)
-                                    : const Color(0xFFEF4444),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: _isTesting ? null : _runTestPing,
-                      icon: _isTesting
-                          ? const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.bolt_rounded, size: 16),
-                      label: Text(_isTesting ? 'Pinging...' : 'Test Ping'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF06B6D4),
-                        textStyle: GoogleFonts.spaceGrotesk(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Save Button
+              // Save Action
               LuxuryButton(
-                text: 'Save & Connect Webhook',
-                icon: Icons.check_circle_outline_rounded,
+                text: widget.existingWebhook != null ? 'Update Webhook' : 'Save Webhook',
+                icon: Icons.check_rounded,
                 onPressed: _saveWebhook,
               ),
               const SizedBox(height: 10),

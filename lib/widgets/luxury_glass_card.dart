@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class LuxuryGlassCard extends StatelessWidget {
@@ -6,11 +5,10 @@ class LuxuryGlassCard extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
   final double borderRadius;
-  final double blurAmount;
   final Color? customBgColor;
   final Color? borderColor;
   final VoidCallback? onTap;
-  final bool hasGlow;
+  final bool hasGlow; // Kept for API compatibility, renders subtle warm accent
   final Color? glowColor;
 
   const LuxuryGlassCard({
@@ -18,8 +16,7 @@ class LuxuryGlassCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(18),
     this.margin,
-    this.borderRadius = 22,
-    this.blurAmount = 16,
+    this.borderRadius = 16,
     this.customBgColor,
     this.borderColor,
     this.onTap,
@@ -32,59 +29,45 @@ class LuxuryGlassCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final defaultBg = isDark
-        ? const Color(0xFF13182C).withValues(alpha: 0.65)
-        : Colors.white.withValues(alpha: 0.82);
+        ? const Color(0xFF161513) // Deep warm espresso surface
+        : Colors.white; // Pure silk ivory surface
 
     final defaultBorder = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.06);
-
-    final effectiveGlowColor = glowColor ?? const Color(0xFF8B5CF6);
+        ? const Color(0xFF282521) // Subtle warm dark hairline
+        : const Color(0xFFEBE6DC); // Delicate warm linen hairline
 
     Widget content = Container(
       margin: margin,
       decoration: BoxDecoration(
+        color: customBgColor ?? defaultBg,
         borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(
+          color: borderColor ?? (hasGlow ? const Color(0xFFC59B6D).withValues(alpha: 0.35) : defaultBorder),
+          width: 1.0,
+        ),
         boxShadow: [
-          if (hasGlow)
-            BoxShadow(
-              color: effectiveGlowColor.withValues(alpha: isDark ? 0.22 : 0.15),
-              blurRadius: 24,
-              spreadRadius: 1,
-              offset: const Offset(0, 6),
-            ),
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha: 0.35)
-                : Colors.black.withValues(alpha: 0.04),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
+                ? Colors.black.withValues(alpha: 0.4)
+                : const Color(0xFF1C1917).withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: customBgColor ?? defaultBg,
-              borderRadius: BorderRadius.circular(borderRadius),
-              border: Border.all(
-                color: borderColor ?? defaultBorder,
-                width: 1.2,
-              ),
-            ),
-            child: child,
-          ),
+        child: Padding(
+          padding: padding ?? const EdgeInsets.all(18),
+          child: child,
         ),
       ),
     );
 
     if (onTap != null) {
-      return GestureDetector(
+      return InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(borderRadius),
         child: content,
       );
     }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_theme.dart';
 
 class LuxuryButton extends StatefulWidget {
   final String text;
@@ -21,8 +20,8 @@ class LuxuryButton extends StatefulWidget {
     this.icon,
     this.isLoading = false,
     this.isSecondary = false,
-    this.height = 56,
-    this.borderRadius = 9999, // Pill shape default
+    this.height = 50,
+    this.borderRadius = 12, // Refined quiet luxury radius
     this.gradient,
     this.textColor,
   });
@@ -38,20 +37,32 @@ class _LuxuryButtonState extends State<LuxuryButton> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final defaultTextColor = widget.textColor ??
-        (widget.isSecondary
-            ? (isDark ? Colors.white : const Color(0xFF0F172A))
-            : Colors.white);
+    // Skinny Brown & Noir styling
+    final primaryFill = isDark
+        ? const Color(0xFFC59B6D) // Warm bronze gold in dark mode
+        : const Color(0xFF8C5E38); // Skinny saddle brown in light mode
+
+    final primaryText = isDark ? const Color(0xFF0F0E0D) : Colors.white;
+
+    final secondaryBg = isDark
+        ? const Color(0xFF1E1D1A)
+        : const Color(0xFFF2EFE9);
+
+    final secondaryBorder = isDark
+        ? const Color(0xFF33302A)
+        : const Color(0xFFE2DDD3);
+
+    final secondaryText = isDark ? const Color(0xFFF7F5F2) : const Color(0xFF1C1917);
 
     return AnimatedScale(
-      scale: _isPressed ? 0.97 : 1.0,
+      scale: _isPressed ? 0.98 : 1.0,
       duration: const Duration(milliseconds: 100),
       curve: Curves.easeOutCubic,
       child: GestureDetector(
         onTapDown: widget.onPressed != null && !widget.isLoading
             ? (_) {
                 setState(() => _isPressed = true);
-                HapticFeedback.lightImpact();
+                HapticFeedback.selectionClick();
               }
             : null,
         onTapUp: widget.onPressed != null && !widget.isLoading
@@ -67,38 +78,30 @@ class _LuxuryButtonState extends State<LuxuryButton> {
           height: widget.height,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            gradient: widget.isSecondary ? null : (widget.gradient ?? AppTheme.primaryGradient),
-            color: widget.isSecondary
-                ? (isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.05))
-                : null,
+            color: widget.isSecondary ? secondaryBg : primaryFill,
             border: widget.isSecondary
-                ? Border.all(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.15)
-                        : Colors.black.withValues(alpha: 0.12),
-                    width: 1.2,
-                  )
+                ? Border.all(color: secondaryBorder, width: 1.0)
                 : null,
             boxShadow: widget.isSecondary
                 ? null
                 : [
                     BoxShadow(
-                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.35),
-                      blurRadius: 20,
-                      offset: const Offset(0, 6),
+                      color: primaryFill.withValues(alpha: isDark ? 0.2 : 0.25),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
                   ],
           ),
           alignment: Alignment.center,
           child: widget.isLoading
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
                   child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      widget.isSecondary ? secondaryText : primaryText,
+                    ),
                   ),
                 )
               : Row(
@@ -106,16 +109,20 @@ class _LuxuryButtonState extends State<LuxuryButton> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (widget.icon != null) ...[
-                      Icon(widget.icon, size: 20, color: defaultTextColor),
+                      Icon(
+                        widget.icon,
+                        size: 18,
+                        color: widget.textColor ?? (widget.isSecondary ? secondaryText : primaryText),
+                      ),
                       const SizedBox(width: 8),
                     ],
                     Text(
                       widget.text,
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: defaultTextColor,
-                        letterSpacing: -0.2,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: widget.textColor ?? (widget.isSecondary ? secondaryText : primaryText),
+                        letterSpacing: -0.1,
                       ),
                     ),
                   ],

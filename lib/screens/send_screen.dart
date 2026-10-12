@@ -7,6 +7,7 @@ import '../models/webhook_target.dart';
 import '../models/dispatch_record.dart';
 import '../services/storage_service.dart';
 import '../services/webhook_service.dart';
+import '../theme/app_theme.dart';
 import '../widgets/luxury_glass_card.dart';
 import '../widgets/luxury_button.dart';
 import '../widgets/glowing_avatar.dart';
@@ -34,18 +35,18 @@ class _SendScreenState extends State<SendScreen> {
   late Profile? _selectedProfile;
   late WebhookTarget? _selectedWebhook;
   final TextEditingController _messageController = TextEditingController(
-    text: '🚨 Heads up! The v2.4 hotfix has been deployed to production. Monitoring metrics now.',
+    text: 'Deployment verified in production • 4 checks passed, 0 errors.',
   );
 
-  String? _attachedFileName = 'hotfix_metrics.png (1.2 MB)';
+  String? _attachedFileName = 'build_summary.pdf (1.2 MB)';
   bool _silentDelivery = false;
   bool _isSending = false;
 
   final List<String> _sampleAttachments = [
-    'hotfix_metrics.png (1.2 MB)',
-    'database_dump.sql (42 MB)',
-    'error_log.json (48 KB)',
-    'release_notes_v2.pdf (4.8 MB)',
+    'build_summary.pdf (1.2 MB)',
+    'release_notes.md (14 KB)',
+    'telemetry_snapshot.json (48 KB)',
+    'audit_report.csv (2.4 MB)',
   ];
 
   @override
@@ -64,7 +65,7 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   void _insertFormatting(String prefix, String suffix) {
-    HapticFeedback.lightImpact();
+    HapticFeedback.selectionClick();
     final text = _messageController.text;
     final selection = _messageController.selection;
     if (!selection.isValid) {
@@ -85,6 +86,9 @@ class _SendScreenState extends State<SendScreen> {
 
   void _showSenderPicker() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryAccent = isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown;
+    final primaryText = isDark ? const Color(0xFFF7F5F2) : const Color(0xFF1C1917);
+    final secondaryText = isDark ? const Color(0xFFA8A29E) : const Color(0xFF78716C);
     final profiles = widget.storageService.profiles;
 
     showModalBottomSheet(
@@ -94,8 +98,11 @@ class _SendScreenState extends State<SendScreen> {
         return Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF13182C) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            color: isDark ? const Color(0xFF141311) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border.all(
+              color: isDark ? const Color(0xFF2A2824) : const Color(0xFFE8E4DC),
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -103,48 +110,52 @@ class _SendScreenState extends State<SendScreen> {
             children: [
               Center(
                 child: Container(
-                  width: 40,
+                  width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.35),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
               Text(
                 'Switch Sender Identity',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 18,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: primaryText,
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               ...profiles.map((p) {
                 final isSelected = p.id == _selectedProfile?.id;
                 return ListTile(
+                  contentPadding: EdgeInsets.zero,
                   leading: GlowingAvatar(
                     avatarValue: p.avatarValue,
+                    customImageUrl: p.customImageUrl,
+                    initials: p.initials,
                     size: 38,
-                    showGlow: isSelected,
+                    showGlow: false,
                   ),
                   title: Text(
                     p.displayName,
-                    style: GoogleFonts.spaceGrotesk(
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: primaryText,
                     ),
                   ),
                   subtitle: Text(
                     p.handle,
                     style: GoogleFonts.jetBrainsMono(
-                      color: const Color(0xFF8B5CF6),
-                      fontSize: 12,
+                      color: secondaryText,
+                      fontSize: 11,
                     ),
                   ),
                   trailing: isSelected
-                      ? const Icon(Icons.check_circle_rounded, color: Color(0xFF10B981))
+                      ? Icon(Icons.check_circle_rounded, color: primaryAccent, size: 20)
                       : null,
                   onTap: () {
                     setState(() => _selectedProfile = p);
@@ -161,6 +172,9 @@ class _SendScreenState extends State<SendScreen> {
 
   void _showDestinationPicker() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryAccent = isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown;
+    final primaryText = isDark ? const Color(0xFFF7F5F2) : const Color(0xFF1C1917);
+    final secondaryText = isDark ? const Color(0xFFA8A29E) : const Color(0xFF78716C);
     final webhooks = widget.storageService.webhooks;
 
     showModalBottomSheet(
@@ -171,8 +185,11 @@ class _SendScreenState extends State<SendScreen> {
         return Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF13182C) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            color: isDark ? const Color(0xFF141311) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border.all(
+              color: isDark ? const Color(0xFF2A2824) : const Color(0xFFE8E4DC),
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -180,28 +197,28 @@ class _SendScreenState extends State<SendScreen> {
             children: [
               Center(
                 child: Container(
-                  width: 40,
+                  width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.35),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Choose Destination Webhook',
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 18,
+                    'Select Destination',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      color: primaryText,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.add_rounded, color: Color(0xFF8B5CF6)),
+                    icon: Icon(Icons.add_rounded, color: primaryAccent),
                     onPressed: () async {
                       Navigator.pop(context);
                       final newHook = await showModalBottomSheet<WebhookTarget>(
@@ -219,17 +236,15 @@ class _SendScreenState extends State<SendScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               if (webhooks.isEmpty)
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Center(
                     child: Text(
-                      'No destinations configured yet.\nTap "+" above to add a webhook!',
+                      'No destinations configured.\nTap "+" to add a webhook.',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        color: isDark ? Colors.white60 : Colors.black54,
-                      ),
+                      style: GoogleFonts.inter(color: secondaryText),
                     ),
                   ),
                 )
@@ -237,24 +252,26 @@ class _SendScreenState extends State<SendScreen> {
                 ...webhooks.map((w) {
                   final isSelected = w.id == _selectedWebhook?.id;
                   return ListTile(
+                    contentPadding: EdgeInsets.zero,
                     leading: DestinationChip(platform: w.platform, showLiveDot: true),
                     title: Text(
                       w.title,
-                      style: GoogleFonts.spaceGrotesk(
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: primaryText,
                       ),
                     ),
                     subtitle: Text(
                       w.maskedUrl,
                       style: GoogleFonts.jetBrainsMono(
                         fontSize: 11,
-                        color: isDark ? Colors.white54 : Colors.black54,
+                        color: secondaryText,
                       ),
                     ),
                     trailing: isSelected
-                        ? const Icon(Icons.check_circle_rounded, color: Color(0xFF10B981))
-                        : (w.isFavorite ? const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 18) : null),
+                        ? Icon(Icons.check_circle_rounded, color: primaryAccent, size: 20)
+                        : (w.isFavorite ? Icon(Icons.star_rounded, color: primaryAccent, size: 18) : null),
                     onTap: () {
                       setState(() => _selectedWebhook = w);
                       Navigator.pop(context);
@@ -270,6 +287,8 @@ class _SendScreenState extends State<SendScreen> {
 
   void _showAttachmentPicker() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryText = isDark ? const Color(0xFFF7F5F2) : const Color(0xFF1C1917);
+    final primaryAccent = isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown;
 
     showModalBottomSheet(
       context: context,
@@ -278,31 +297,35 @@ class _SendScreenState extends State<SendScreen> {
         return Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF13182C) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            color: isDark ? const Color(0xFF141311) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border.all(
+              color: isDark ? const Color(0xFF2A2824) : const Color(0xFFE8E4DC),
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Attach File or Report',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 18,
+                'Attach Sample File',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: primaryText,
                 ),
               ),
               const SizedBox(height: 14),
               ..._sampleAttachments.map((filename) {
                 return ListTile(
-                  leading: const Icon(Icons.attach_file_rounded, color: Color(0xFF06B6D4)),
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.insert_drive_file_outlined, color: primaryAccent, size: 20),
                   title: Text(
                     filename,
                     style: GoogleFonts.jetBrainsMono(
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      color: primaryText,
                     ),
                   ),
                   onTap: () {
@@ -324,7 +347,7 @@ class _SendScreenState extends State<SendScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select or create a sender profile first!'),
-          backgroundColor: Color(0xFFEF4444),
+          backgroundColor: Color(0xFF1C1917),
         ),
       );
       return;
@@ -334,7 +357,7 @@ class _SendScreenState extends State<SendScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please connect a destination webhook first!'),
-          backgroundColor: Color(0xFFEF4444),
+          backgroundColor: Color(0xFF1C1917),
         ),
       );
       return;
@@ -345,14 +368,14 @@ class _SendScreenState extends State<SendScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please write a message or attach a file.'),
-          backgroundColor: Color(0xFFEF4444),
+          backgroundColor: Color(0xFF1C1917),
         ),
       );
       return;
     }
 
     setState(() => _isSending = true);
-    HapticFeedback.heavyImpact();
+    HapticFeedback.mediumImpact();
 
     final result = await WebhookService.send(
       profile: _selectedProfile!,
@@ -397,13 +420,14 @@ class _SendScreenState extends State<SendScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "Couldn't send: ${result.errorMessage ?? 'Status ${result.statusCode}'}. Tap to retry.",
+              "Delivery error: ${result.errorMessage ?? 'Status ${result.statusCode}'}",
+              style: GoogleFonts.plusJakartaSans(),
             ),
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: const Color(0xFF1C1917),
             behavior: SnackBarBehavior.floating,
             action: SnackBarAction(
               label: 'Retry',
-              textColor: Colors.white,
+              textColor: AppTheme.bronzeGold,
               onPressed: _handleSend,
             ),
           ),
@@ -415,10 +439,25 @@ class _SendScreenState extends State<SendScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryText = isDark ? const Color(0xFFF7F5F2) : const Color(0xFF1C1917);
+    final secondaryText = isDark ? const Color(0xFFA8A29E) : const Color(0xFF78716C);
+    final primaryAccent = isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown;
+    final borderColor = isDark ? const Color(0xFF2A2824) : const Color(0xFFE8E4DC);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Dispatch'),
+        title: Text(
+          'Dispatch Message',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: primaryText,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           if (_selectedProfile != null)
             GestureDetector(
@@ -427,33 +466,31 @@ class _SendScreenState extends State<SendScreen> {
                 margin: const EdgeInsets.only(right: 16),
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.black.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-                  ),
+                  color: isDark ? const Color(0xFF1C1A17) : const Color(0xFFF3ECE4),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: borderColor),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     GlowingAvatar(
                       avatarValue: _selectedProfile!.avatarValue,
+                      customImageUrl: _selectedProfile!.customImageUrl,
+                      initials: _selectedProfile!.initials,
                       size: 22,
                       showGlow: false,
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 8),
                     Text(
                       _selectedProfile!.displayName,
-                      style: GoogleFonts.spaceGrotesk(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        fontWeight: FontWeight.w600,
+                        color: primaryText,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(Icons.arrow_drop_down_rounded, size: 18),
+                    Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: secondaryText),
                   ],
                 ),
               ),
@@ -461,293 +498,280 @@ class _SendScreenState extends State<SendScreen> {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Destination Selector Card
-              LuxuryGlassCard(
-                padding: const EdgeInsets.all(16),
-                onTap: _showDestinationPicker,
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 580),
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              children: [
+                // 1. Destination Selector Card
+                LuxuryGlassCard(
+                  padding: const EdgeInsets.all(16),
+                  borderRadius: 16,
+                  onTap: _showDestinationPicker,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: primaryAccent.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.webhook_rounded,
+                          size: 18,
+                          color: primaryAccent,
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.send_to_mobile_rounded,
-                        size: 20,
-                        color: Color(0xFF3B82F6),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'DESTINATION',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: primaryAccent,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              children: [
+                                if (_selectedWebhook != null) ...[
+                                  DestinationChip(
+                                    platform: _selectedWebhook!.platform,
+                                    showLiveDot: true,
+                                  ),
+                                  const SizedBox(width: 8),
+                                ],
+                                Expanded(
+                                  child: Text(
+                                    _selectedWebhook != null
+                                        ? _selectedWebhook!.title
+                                        : 'Tap to select destination',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: primaryText,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Text(
+                        'Change',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: primaryAccent,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // 2. Formatting Toolbar & Message Composer
+                LuxuryGlassCard(
+                  padding: const EdgeInsets.all(16),
+                  borderRadius: 18,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Formatting toolbar
+                      Row(
+                        children: [
+                          _buildFormatButton('B', () => _insertFormatting('**', '**')),
+                          _buildFormatButton('I', () => _insertFormatting('*', '*')),
+                          _buildFormatButton('`Code`', () => _insertFormatting('`', '`')),
+                          _buildFormatButton('Link', () => _insertFormatting('[Link](', ')')),
+                          const Spacer(),
+                          ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: _messageController,
+                            builder: (context, val, _) {
+                              return Text(
+                                '${val.text.length} / 2000',
+                                style: GoogleFonts.jetBrainsMono(
+                                  fontSize: 10,
+                                  color: secondaryText,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Divider(height: 1, color: borderColor),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _messageController,
+                        maxLines: 5,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: primaryText,
+                          height: 1.45,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Type your message...',
+                          hintStyle: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: secondaryText.withValues(alpha: 0.6),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // 3. Attach File Section
+                LuxuryGlassCard(
+                  padding: const EdgeInsets.all(16),
+                  borderRadius: 16,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'SENDING TO',
-                            style: GoogleFonts.spaceGrotesk(
+                            'ATTACHMENT',
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF06B6D4),
+                              fontWeight: FontWeight.w700,
+                              color: primaryAccent,
                               letterSpacing: 0.8,
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Row(
+                          Text(
+                            'Up to 25MB',
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              color: secondaryText,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      if (_attachedFileName != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF1C1A17) : const Color(0xFFF3ECE4),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Row(
                             children: [
-                              if (_selectedWebhook != null) ...[
-                                DestinationChip(
-                                  platform: _selectedWebhook!.platform,
-                                  showLiveDot: true,
-                                ),
-                                const SizedBox(width: 6),
-                              ],
+                              Icon(
+                                Icons.insert_drive_file_outlined,
+                                size: 16,
+                                color: primaryAccent,
+                              ),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  _selectedWebhook != null
-                                      ? _selectedWebhook!.title
-                                      : 'Tap to select destination',
-                                  style: GoogleFonts.spaceGrotesk(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  _attachedFileName!,
+                                  style: GoogleFonts.jetBrainsMono(
+                                    fontSize: 12,
+                                    color: primaryText,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+                              InkWell(
+                                onTap: () => setState(() => _attachedFileName = null),
+                                child: Icon(Icons.close_rounded, size: 16, color: secondaryText),
+                              ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        'Change →',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF8B5CF6),
+                        )
+                      else
+                        OutlinedButton.icon(
+                          onPressed: _showAttachmentPicker,
+                          icon: Icon(Icons.attach_file_rounded, size: 16, color: primaryAccent),
+                          label: Text(
+                            'Attach File Sample',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              color: primaryAccent,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: borderColor),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            minimumSize: const Size(double.infinity, 40),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 18),
+                const SizedBox(height: 16),
 
-              // 2. Formatting Toolbar & Message Input Box
-              LuxuryGlassCard(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Micro-formatting toolbar
-                    Row(
-                      children: [
-                        _buildFormatButton('B', () => _insertFormatting('**', '**')),
-                        _buildFormatButton('I', () => _insertFormatting('*', '*')),
-                        _buildFormatButton('`Code`', () => _insertFormatting('`', '`')),
-                        _buildFormatButton('Link', () => _insertFormatting('[Link](', ')')),
-                        _buildFormatButton('🔥', () => _insertFormatting('🔥', '')),
-                        _buildFormatButton('🚀', () => _insertFormatting('🚀', '')),
-                        const Spacer(),
-                        ValueListenableBuilder<TextEditingValue>(
-                          valueListenable: _messageController,
-                          builder: (context, val, _) {
-                            return Text(
-                              '${val.text.length} / 2000',
-                              style: GoogleFonts.jetBrainsMono(
-                                fontSize: 10,
-                                color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    const Divider(height: 16),
-                    TextField(
-                      controller: _messageController,
-                      maxLines: 6,
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        height: 1.45,
+                // 4. Silent delivery switch
+                LuxuryGlassCard(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  borderRadius: 16,
+                  child: Row(
+                    children: [
+                      Icon(
+                        _silentDelivery ? Icons.notifications_off_outlined : Icons.notifications_active_outlined,
+                        size: 18,
+                        color: secondaryText,
                       ),
-                      decoration: InputDecoration(
-                        hintText: 'Write your message... Markdown and links supported.',
-                        hintStyle: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                        ),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // 3. Attach File Section
-              LuxuryGlassCard(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'ATTACH FILE',
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFF06B6D4),
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                        Text(
-                          'Images, logs, PDFs up to 25MB',
-                          style: GoogleFonts.jetBrainsMono(
-                            fontSize: 10,
-                            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    if (_attachedFileName != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF06B6D4).withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: const Color(0xFF06B6D4).withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Row(
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                              Icons.insert_drive_file_rounded,
-                              size: 18,
-                              color: Color(0xFF06B6D4),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _attachedFileName!,
-                                style: GoogleFonts.jetBrainsMono(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                            Text(
+                              'Silent Delivery',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: primaryText,
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.close_rounded, size: 16),
-                              onPressed: () {
-                                setState(() => _attachedFileName = null);
-                              },
+                            Text(
+                              'Suppress recipient alert sounds',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: secondaryText,
+                              ),
                             ),
                           ],
                         ),
-                      )
-                    else
-                      OutlinedButton.icon(
-                        onPressed: _showAttachmentPicker,
-                        icon: const Icon(Icons.attach_file_rounded, size: 18),
-                        label: const Text('Attach File / Log Sample'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF06B6D4),
-                          side: const BorderSide(color: Color(0xFF06B6D4)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          minimumSize: const Size(double.infinity, 44),
-                        ),
                       ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // 4. Silent delivery switch
-              LuxuryGlassCard(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Row(
-                  children: [
-                    Icon(
-                      _silentDelivery ? Icons.notifications_off_rounded : Icons.notifications_active_rounded,
-                      size: 20,
-                      color: _silentDelivery ? const Color(0xFFF59E0B) : const Color(0xFF10B981),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Silent Delivery',
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
-                            ),
-                          ),
-                          Text(
-                            'Sends without ringing or notification sound',
-                            style: GoogleFonts.inter(
-                              fontSize: 11,
-                              color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                            ),
-                          ),
-                        ],
+                      Switch(
+                        value: _silentDelivery,
+                        activeThumbColor: primaryAccent,
+                        onChanged: (val) => setState(() => _silentDelivery = val),
                       ),
-                    ),
-                    Switch(
-                      value: _silentDelivery,
-                      activeThumbColor: const Color(0xFF8B5CF6),
-                      onChanged: (val) {
-                        setState(() => _silentDelivery = val);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 28),
-
-              // 5. Prominent "Send Webhook (1 Tap)" Button
-              LuxuryButton(
-                text: 'Send Webhook (1 Tap)',
-                icon: Icons.rocket_launch_rounded,
-                isLoading: _isSending,
-                onPressed: _handleSend,
-              ),
-              const SizedBox(height: 8),
-              Center(
-                child: Text(
-                  'Delivers instantly across all connected webhook listeners.',
-                  style: GoogleFonts.jetBrainsMono(
-                    fontSize: 11,
-                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-            ],
+                const SizedBox(height: 28),
+
+                // 5. Send Webhook Button
+                LuxuryButton(
+                  text: 'Dispatch Webhook',
+                  icon: Icons.send_rounded,
+                  isLoading: _isSending,
+                  onPressed: _handleSend,
+                ),
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
         ),
       ),
@@ -756,21 +780,24 @@ class _SendScreenState extends State<SendScreen> {
 
   Widget _buildFormatButton(String label, VoidCallback onTap) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondaryText = isDark ? const Color(0xFFA8A29E) : const Color(0xFF78716C);
+    final borderColor = isDark ? const Color(0xFF2A2824) : const Color(0xFFE8E4DC);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(right: 6),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: borderColor),
         ),
         child: Text(
           label,
-          style: GoogleFonts.spaceGrotesk(
+          style: GoogleFonts.jetBrainsMono(
             fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: isDark ? Colors.white70 : Colors.black87,
+            fontWeight: FontWeight.w600,
+            color: secondaryText,
           ),
         ),
       ),

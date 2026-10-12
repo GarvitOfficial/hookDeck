@@ -15,19 +15,6 @@ class DestinationChip extends StatelessWidget {
     this.showLiveDot = false,
   });
 
-  static Color getPlatformColor(String platform) {
-    switch (platform.toLowerCase()) {
-      case 'discord':
-        return const Color(0xFF5865F2);
-      case 'slack':
-        return const Color(0xFFECB22E);
-      case 'telegram':
-        return const Color(0xFF229ED9);
-      default:
-        return const Color(0xFF8B5CF6);
-    }
-  }
-
   static String getPlatformTitle(String platform) {
     switch (platform.toLowerCase()) {
       case 'discord':
@@ -41,34 +28,34 @@ class DestinationChip extends StatelessWidget {
     }
   }
 
-  static IconData getPlatformIcon(String platform) {
-    switch (platform.toLowerCase()) {
-      case 'discord':
-        return Icons.chat_bubble_rounded;
-      case 'slack':
-        return Icons.tag_rounded;
-      case 'telegram':
-        return Icons.send_rounded;
-      default:
-        return Icons.webhook_rounded;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final color = getPlatformColor(platform);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final selectedBg = isDark
+        ? const Color(0xFFC59B6D).withValues(alpha: 0.18)
+        : const Color(0xFF8C5E38).withValues(alpha: 0.12);
+
+    final selectedBorder = isDark
+        ? const Color(0xFFC59B6D)
+        : const Color(0xFF8C5E38);
+
+    final unselectedBg = isDark
+        ? const Color(0xFF1E1D1A)
+        : const Color(0xFFF2EFE9);
+
+    final unselectedBorder = isDark
+        ? const Color(0xFF2E2B26)
+        : const Color(0xFFE2DDD3);
 
     Widget chip = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isSelected
-            ? color.withValues(alpha: 0.22)
-            : (isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04)),
-        borderRadius: BorderRadius.circular(999),
+        color: isSelected ? selectedBg : unselectedBg,
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isSelected ? color : Colors.transparent,
-          width: 1.2,
+          color: isSelected ? selectedBorder : unselectedBorder,
+          width: 1.0,
         ),
       ),
       child: Row(
@@ -76,32 +63,23 @@ class DestinationChip extends StatelessWidget {
         children: [
           if (showLiveDot) ...[
             Container(
-              width: 6,
-              height: 6,
+              width: 5,
+              height: 5,
               margin: const EdgeInsets.only(right: 6),
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: Color(0xFF10B981),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFF10B981),
-                    blurRadius: 4,
-                  ),
-                ],
+                color: Color(0xFF2E7D52), // Refined forest emerald
               ),
             ),
-          ] else ...[
-            Icon(getPlatformIcon(platform), size: 13, color: color),
-            const SizedBox(width: 5),
           ],
           Text(
             getPlatformTitle(platform),
-            style: GoogleFonts.spaceGrotesk(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 11,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: isSelected
-                  ? color
-                  : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
+                  ? (isDark ? const Color(0xFFC59B6D) : const Color(0xFF8C5E38))
+                  : (isDark ? const Color(0xFFA8A29E) : const Color(0xFF57534E)),
             ),
           ),
         ],
@@ -109,8 +87,9 @@ class DestinationChip extends StatelessWidget {
     );
 
     if (onTap != null) {
-      return GestureDetector(
+      return InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
         child: chip,
       );
     }

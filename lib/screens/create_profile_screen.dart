@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
 import '../models/profile.dart';
 import '../services/storage_service.dart';
+import '../theme/app_theme.dart';
 import '../widgets/luxury_glass_card.dart';
 import '../widgets/luxury_button.dart';
 import '../widgets/glowing_avatar.dart';
@@ -27,17 +28,17 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _handleController;
-  late String _selectedAvatar;
+  late TextEditingController _imageUrlController;
+  late String _selectedTone;
   bool _isSaving = false;
 
-  final List<Map<String, dynamic>> _presets = [
-    {'id': 'robot', 'name': '🤖 Bot'},
-    {'id': 'bolt', 'name': '⚡ Alert'},
-    {'id': 'terminal', 'name': '💻 Tech'},
-    {'id': 'flame', 'name': '🔥 Sentry'},
-    {'id': 'rocket', 'name': '🚀 CI/CD'},
-    {'id': 'shield', 'name': '🛡️ Security'},
-    {'id': 'user', 'name': '👤 Personal'},
+  final List<Map<String, String>> _luxuryTones = [
+    {'id': 'brown', 'name': 'Saddle Brown', 'hex': '#8C5E38'},
+    {'id': 'espresso', 'name': 'Espresso Noir', 'hex': '#262320'},
+    {'id': 'champagne', 'name': 'Bronze Gold', 'hex': '#C59B6D'},
+    {'id': 'terracotta', 'name': 'Terracotta', 'hex': '#9E4732'},
+    {'id': 'olive', 'name': 'Forest Olive', 'hex': '#55604C'},
+    {'id': 'slate', 'name': 'Cashmere Slate', 'hex': '#475569'},
   ];
 
   @override
@@ -46,131 +47,27 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     final p = widget.existingProfile;
     _nameController = TextEditingController(text: p?.displayName ?? '');
     _handleController = TextEditingController(text: p?.handle ?? '');
-    _selectedAvatar = p?.avatarValue ?? 'robot';
+    _imageUrlController = TextEditingController(text: p?.customImageUrl ?? '');
+    _selectedTone = p?.avatarValue ?? 'brown';
 
-    _nameController.addListener(() {
-      setState(() {});
-    });
-    _handleController.addListener(() {
-      setState(() {});
-    });
+    _nameController.addListener(() => setState(() {}));
+    _handleController.addListener(() => setState(() {}));
+    _imageUrlController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _handleController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
-  void _onPresetSelected(String avatarId) {
-    HapticFeedback.lightImpact();
+  void _onToneSelected(String toneId) {
+    HapticFeedback.selectionClick();
     setState(() {
-      _selectedAvatar = avatarId;
+      _selectedTone = toneId;
     });
-  }
-
-  void _showAvatarPicker() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF13182C) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            border: Border.all(
-              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Choose Sender Avatar',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Select an identity badge for this profile',
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: _presets.map((preset) {
-                  final id = preset['id'] as String;
-                  final isSelected = id == _selectedAvatar;
-                  return GestureDetector(
-                    onTap: () {
-                      _onPresetSelected(id);
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? const Color(0xFF8B5CF6).withValues(alpha: 0.2)
-                            : (isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.04)),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isSelected ? const Color(0xFF8B5CF6) : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          GlowingAvatar(
-                            avatarValue: id,
-                            size: 48,
-                            showGlow: isSelected,
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            preset['name'] as String,
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   Future<void> _saveProfile() async {
@@ -179,224 +76,181 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     setState(() => _isSaving = true);
     HapticFeedback.mediumImpact();
 
-    final name = _nameController.text.trim();
-    var handle = _handleController.text.trim();
-    if (!handle.startsWith('@')) {
-      handle = '@$handle';
-    }
+    try {
+      final name = _nameController.text.trim();
+      var handle = _handleController.text.trim();
+      if (!handle.startsWith('@')) {
+        handle = '@$handle';
+      }
 
-    final now = DateTime.now();
-    final profile = widget.existingProfile != null
-        ? widget.existingProfile!.copyWith(
-            displayName: name,
-            handle: handle,
-            avatarValue: _selectedAvatar,
-          )
-        : Profile(
-            id: const Uuid().v4(),
-            displayName: name,
-            handle: handle,
-            avatarValue: _selectedAvatar,
-            isPrimary: widget.storageService.profiles.isEmpty,
-            createdAt: now,
-          );
+      final customImg = _imageUrlController.text.trim();
 
-    await widget.storageService.saveProfile(profile);
+      if (widget.existingProfile != null) {
+        final updated = widget.existingProfile!.copyWith(
+          displayName: name,
+          handle: handle,
+          avatarValue: _selectedTone,
+          customImageUrl: customImg.isEmpty ? null : customImg,
+        );
+        await widget.storageService.saveProfile(updated);
+      } else {
+        final newProfile = Profile(
+          id: const Uuid().v4(),
+          displayName: name,
+          handle: handle,
+          avatarValue: _selectedTone,
+          customImageUrl: customImg.isEmpty ? null : customImg,
+          createdAt: DateTime.now(),
+        );
+        await widget.storageService.saveProfile(newProfile);
+      }
 
-    if (mounted) {
-      setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            widget.existingProfile != null
-                ? 'Profile updated successfully ✓'
-                : 'Profile "${profile.displayName}" created ✓',
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: const Color(0xFF1C1917),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Color(0xFF2A2824)),
+            ),
+            content: Text(
+              widget.existingProfile != null ? 'Profile updated' : 'Profile created',
+              style: GoogleFonts.plusJakartaSans(
+                color: const Color(0xFFF7F5F2),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-          backgroundColor: const Color(0xFF10B981),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      Navigator.pop(context);
+        );
+        Navigator.pop(context, true);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryText = isDark ? const Color(0xFFF7F5F2) : const Color(0xFF1C1917);
+    final secondaryText = isDark ? const Color(0xFFA8A29E) : const Color(0xFF78716C);
+    final borderColor = isDark ? const Color(0xFF2A2824) : const Color(0xFFE8E4DC);
+    final inputFill = isDark ? const Color(0xFF141311) : Colors.white;
+
     final isEditing = widget.existingProfile != null;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Profile' : 'Create Profile'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.spaceGrotesk(
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+        title: Text(
+          isEditing ? 'Edit Profile' : 'New Profile',
+          style: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 17,
+            color: primaryText,
           ),
-        ],
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 580),
           child: Form(
             key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               children: [
-                // Circular Photo / Avatar Uploader with Camera Badge
+                // Minimalist Avatar Banner
                 Center(
-                  child: Stack(
-                    alignment: Alignment.center,
+                  child: Column(
                     children: [
                       GlowingAvatar(
-                        avatarValue: _selectedAvatar,
-                        size: 96,
-                        showGlow: true,
-                        onTap: _showAvatarPicker,
+                        avatarValue: _selectedTone,
+                        customImageUrl: _imageUrlController.text.trim().isNotEmpty
+                            ? _imageUrlController.text.trim()
+                            : null,
+                        initials: _nameController.text.trim().isNotEmpty
+                            ? _nameController.text.trim().substring(0, _nameController.text.trim().length.clamp(1, 2)).toUpperCase()
+                            : 'HD',
+                        size: 80,
+                        showGlow: false,
                       ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: _showAvatarPicker,
-                          child: Container(
-                            padding: const EdgeInsets.all(7),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF8B5CF6),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.5),
-                                  blurRadius: 8,
-                                ),
-                              ],
-                              border: Border.all(
-                                color: isDark ? const Color(0xFF090C15) : Colors.white,
-                                width: 2,
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.camera_alt_rounded,
-                              size: 15,
-                              color: Colors.white,
-                            ),
-                          ),
+                      const SizedBox(height: 10),
+                      Text(
+                        _imageUrlController.text.trim().isNotEmpty
+                            ? 'Custom Image Loaded'
+                            : 'Monogram Identity',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: secondaryText,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 10),
-                TextButton(
-                  onPressed: _showAvatarPicker,
-                  child: Text(
-                    'Tap to change avatar icon',
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF8B5CF6),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Preset selector pills row
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: _presets.map((preset) {
-                      final id = preset['id'] as String;
-                      final isSelected = id == _selectedAvatar;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          label: Text(preset['name'] as String),
-                          selected: isSelected,
-                          onSelected: (_) => _onPresetSelected(id),
-                          selectedColor: const Color(0xFF8B5CF6).withValues(alpha: 0.25),
-                          backgroundColor: isDark
-                              ? Colors.white.withValues(alpha: 0.05)
-                              : Colors.black.withValues(alpha: 0.04),
-                          labelStyle: GoogleFonts.spaceGrotesk(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: isSelected
-                                ? const Color(0xFF8B5CF6)
-                                : (isDark ? Colors.white70 : Colors.black87),
-                          ),
-                          side: BorderSide(
-                            color: isSelected ? const Color(0xFF8B5CF6) : Colors.transparent,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
                 const SizedBox(height: 24),
 
-                // Form Fields
+                // Form Section
                 LuxuryGlassCard(
                   padding: const EdgeInsets.all(20),
-                  borderRadius: 22,
+                  borderRadius: 20,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Display Name
                       Text(
-                        'Sender Display Name',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 13,
+                        'IDENTITY DETAILS',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown,
+                          letterSpacing: 1.1,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 18),
+
+                      // Display Name
+                      Text(
+                        'Display Name',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: primaryText,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       TextFormField(
                         controller: _nameController,
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        ),
+                        style: GoogleFonts.plusJakartaSans(fontSize: 14, color: primaryText),
                         decoration: InputDecoration(
-                          hintText: 'e.g. Deploy Bot, Sarah Connor, Alpha Alerts',
-                          hintStyle: GoogleFonts.inter(
-                            fontSize: 13,
-                            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                          ),
-                          prefixIcon: const Icon(Icons.badge_outlined, size: 20),
+                          hintText: 'e.g. Release Dispatcher',
+                          hintStyle: GoogleFonts.inter(fontSize: 13, color: secondaryText.withValues(alpha: 0.6)),
                           filled: true,
-                          fillColor: isDark
-                              ? const Color(0xFF0A0D18).withValues(alpha: 0.6)
-                              : Colors.black.withValues(alpha: 0.03),
+                          fillColor: inputFill,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                              color: isDark ? Colors.white12 : Colors.black12,
-                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                              color: isDark ? Colors.white12 : Colors.black12,
-                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF8B5CF6),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown,
                               width: 1.5,
                             ),
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter a sender display name';
+                        validator: (val) {
+                          if (val == null || val.trim().isEmpty) {
+                            return 'Please enter a display name';
                           }
                           return null;
                         },
@@ -406,64 +260,168 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       // Handle / ID
                       Text(
                         'ID / Handle',
-                        style: GoogleFonts.spaceGrotesk(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          fontWeight: FontWeight.w600,
+                          color: primaryText,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 8),
                       TextFormField(
                         controller: _handleController,
-                        style: GoogleFonts.jetBrainsMono(
-                          fontSize: 14,
-                          color: const Color(0xFF8B5CF6),
-                        ),
+                        style: GoogleFonts.jetBrainsMono(fontSize: 13, color: primaryText),
                         decoration: InputDecoration(
-                          hintText: 'e.g. @deploy_bot or sarah.dev',
-                          hintStyle: GoogleFonts.jetBrainsMono(
-                            fontSize: 12,
-                            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                          ),
-                          prefixIcon: const Icon(Icons.alternate_email_rounded, size: 20),
+                          hintText: '@release-bot',
+                          hintStyle: GoogleFonts.jetBrainsMono(fontSize: 12, color: secondaryText.withValues(alpha: 0.6)),
                           filled: true,
-                          fillColor: isDark
-                              ? const Color(0xFF0A0D18).withValues(alpha: 0.6)
-                              : Colors.black.withValues(alpha: 0.03),
+                          fillColor: inputFill,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                              color: isDark ? Colors.white12 : Colors.black12,
-                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                              color: isDark ? Colors.white12 : Colors.black12,
-                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF8B5CF6),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown,
                               width: 1.5,
                             ),
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter an identity handle';
+                        validator: (val) {
+                          if (val == null || val.trim().isEmpty) {
+                            return 'Please enter a handle/ID';
                           }
                           return null;
                         },
                       ),
+                      const SizedBox(height: 18),
+
+                      // Custom Image URL (Full User Empowerment!)
+                      Row(
+                        children: [
+                          Text(
+                            'Custom Profile Image URL',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: primaryText,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            'Optional',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: secondaryText,
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 8),
-                      Text(
-                        'The sender identity that webhooks will show in Discord, Slack, etc.',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                      TextFormField(
+                        controller: _imageUrlController,
+                        style: GoogleFonts.inter(fontSize: 13, color: primaryText),
+                        decoration: InputDecoration(
+                          hintText: 'https://example.com/avatar.png',
+                          hintStyle: GoogleFonts.inter(fontSize: 12, color: secondaryText.withValues(alpha: 0.6)),
+                          prefixIcon: Icon(
+                            Icons.link_rounded,
+                            size: 18,
+                            color: isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown,
+                          ),
+                          suffixIcon: _imageUrlController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear_rounded, size: 16),
+                                  onPressed: () => _imageUrlController.clear(),
+                                )
+                              : null,
+                          filled: true,
+                          fillColor: inputFill,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown,
+                              width: 1.5,
+                            ),
+                          ),
                         ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Palette Tone / Monogram Style
+                      Text(
+                        'Identity Tone & Accent',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: primaryText,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 10,
+                        children: _luxuryTones.map((tone) {
+                          final isSelected = _selectedTone == tone['id'];
+                          final color = GlowingAvatar.getLuxuryBg(tone['id']!);
+
+                          return InkWell(
+                            onTap: () => _onToneSelected(tone['id']!),
+                            borderRadius: BorderRadius.circular(30),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? (isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown)
+                                      : borderColor,
+                                  width: isSelected ? 1.5 : 1,
+                                ),
+                                color: isSelected
+                                    ? (isDark ? const Color(0xFF1E1C19) : const Color(0xFFF3ECE4))
+                                    : Colors.transparent,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 14,
+                                    height: 14,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: color,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    tone['name']!,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 12,
+                                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                      color: isSelected ? primaryText : secondaryText,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -474,18 +432,21 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 LivePreviewCard(
                   displayName: _nameController.text,
                   handle: _handleController.text,
-                  avatarValue: _selectedAvatar,
+                  avatarValue: _selectedTone,
+                  customImageUrl: _imageUrlController.text.trim().isNotEmpty
+                      ? _imageUrlController.text.trim()
+                      : null,
                 ),
                 const SizedBox(height: 28),
 
-                // Save Profile Button
+                // Save Button
                 LuxuryButton(
                   text: isEditing ? 'Save Changes' : 'Save Profile',
-                  icon: Icons.check_circle_rounded,
+                  icon: Icons.check_rounded,
                   isLoading: _isSaving,
                   onPressed: _saveProfile,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
               ],
             ),
           ),

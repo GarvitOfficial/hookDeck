@@ -7,6 +7,7 @@ class LivePreviewCard extends StatelessWidget {
   final String displayName;
   final String handle;
   final String avatarValue;
+  final String? customImageUrl;
   final String? sampleMessage;
 
   const LivePreviewCard({
@@ -14,6 +15,7 @@ class LivePreviewCard extends StatelessWidget {
     required this.displayName,
     required this.handle,
     required this.avatarValue,
+    this.customImageUrl,
     this.sampleMessage,
   });
 
@@ -21,49 +23,33 @@ class LivePreviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final resolvedName = displayName.trim().isEmpty ? 'Deploy Bot' : displayName.trim();
-    final resolvedHandle = handle.trim().isEmpty ? '@deploy_bot' : handle.trim();
-    final message = sampleMessage ?? '🚀 Build #204 passed in production • 4 tests passed, 0 failures';
+    final resolvedName = displayName.trim().isEmpty ? 'Identity Name' : displayName.trim();
+    final resolvedHandle = handle.trim().isEmpty ? '@handle' : handle.trim();
+    final message = sampleMessage ?? 'Deployment #204 passed in production • 4 checks verified, 0 alerts.';
 
     return LuxuryGlassCard(
       padding: const EdgeInsets.all(16),
-      borderRadius: 20,
-      hasGlow: true,
-      glowColor: const Color(0xFF8B5CF6),
+      borderRadius: 16,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.visibility_rounded,
-                size: 15,
-                color: Color(0xFF06B6D4),
-              ),
-              const SizedBox(width: 6),
               Text(
                 'LIVE SENDER PREVIEW',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 11,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF06B6D4),
-                  letterSpacing: 0.8,
+                  color: isDark ? const Color(0xFFC59B6D) : const Color(0xFF8C5E38),
+                  letterSpacing: 1.2,
                 ),
               ),
               const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF5865F2).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  'Discord / Slack Simulation',
-                  style: GoogleFonts.jetBrainsMono(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF818CF8),
-                  ),
+              Text(
+                'Real Destination Output',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: isDark ? const Color(0xFF78716C) : const Color(0xFFA8A29E),
                 ),
               ),
             ],
@@ -74,7 +60,8 @@ class LivePreviewCard extends StatelessWidget {
             children: [
               GlowingAvatar(
                 avatarValue: avatarValue,
-                size: 42,
+                customImageUrl: customImageUrl,
+                size: 38,
                 showGlow: false,
               ),
               const SizedBox(width: 12),
@@ -87,22 +74,22 @@ class LivePreviewCard extends StatelessWidget {
                         Flexible(
                           child: Text(
                             resolvedName,
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: 14,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                              color: isDark ? Colors.white : const Color(0xFF1C1917),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 6),
                         const BotVerifiedBadge(),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Text(
                           'Just now',
                           style: GoogleFonts.inter(
                             fontSize: 11,
-                            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                            color: isDark ? const Color(0xFF78716C) : const Color(0xFFA8A29E),
                           ),
                         ),
                       ],
@@ -112,29 +99,26 @@ class LivePreviewCard extends StatelessWidget {
                       resolvedHandle,
                       style: GoogleFonts.jetBrainsMono(
                         fontSize: 11,
-                        color: const Color(0xFF8B5CF6),
+                        color: isDark ? const Color(0xFFC59B6D) : const Color(0xFF8C5E38),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF0A0D18).withValues(alpha: 0.6)
-                            : Colors.white.withValues(alpha: 0.8),
-                        borderRadius: BorderRadius.circular(12),
+                        color: isDark ? const Color(0xFF1E1D1A) : const Color(0xFFF7F5F0),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.05)
-                              : Colors.black.withValues(alpha: 0.04),
+                          color: isDark ? const Color(0xFF2B2824) : const Color(0xFFE5E0D5),
+                          width: 1,
                         ),
                       ),
                       child: Text(
                         message,
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
-                          height: 1.35,
+                          color: isDark ? const Color(0xFFE7E5E4) : const Color(0xFF292524),
+                          height: 1.4,
                         ),
                       ),
                     ),
