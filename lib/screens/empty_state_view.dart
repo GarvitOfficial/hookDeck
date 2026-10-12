@@ -42,15 +42,26 @@ class EmptyStateView extends StatelessWidget {
                   width: 84,
                   height: 84,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: iconBg,
+                    borderRadius: BorderRadius.circular(22),
                     border: Border.all(color: iconRingBorder, width: 1.5),
                   ),
-                  child: Center(
-                    child: Icon(
-                      Icons.fingerprint_rounded,
-                      size: 38,
-                      color: isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 84,
+                      height: 84,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: iconBg,
+                        child: Center(
+                          child: Icon(
+                            Icons.fingerprint_rounded,
+                            size: 38,
+                            color: isDark ? AppTheme.bronzeGold : AppTheme.luxuryBrown,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),

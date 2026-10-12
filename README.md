@@ -1,11 +1,15 @@
+<p align="center">
+  <img src="screenshots/hookdeck_luxury_logo.jpg" alt="HookDeck Luxury Emblem" width="160" style="border-radius: 36px;" />
+</p>
+
 # HookDeck ✦ Quiet Luxury Webhook Dispatcher
 
 <p align="center">
-  <img src="screenshots/03_profiles_home.png" alt="HookDeck Hero Banner" width="420" />
+  <b>A minimalist, bespoke Flutter mobile & web application for dispatching messages, telemetry, and file attachments through webhooks in 1–2 taps—without writing code.</b>
 </p>
 
 <p align="center">
-  <b>A minimalist, bespoke Flutter mobile & web application for dispatching messages, telemetry, and file attachments through webhooks in 1–2 taps—without writing code.</b>
+  <img src="screenshots/03_profiles_home.png" alt="HookDeck Hero Banner" width="380" />
 </p>
 
 <p align="center">
