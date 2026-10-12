@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="screenshots/hookdeck_crest_logo.jpg" alt="HookDeck Emblem" width="160" style="border-radius: 36px; box-shadow: 0 12px 36px rgba(0,0,0,0.4);" />
+  <img src="screenshots/hookdeck_banner.jpg" alt="HookDeck Webhook Sender Hero Banner" width="100%" style="border-radius: 18px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);" />
 </p>
 
 # HookDeck: Webhook Sender
@@ -111,6 +111,126 @@ Dispatch messages and real device attachments with zero clutter, clean empty sta
 - **Typography**: [Google Fonts](https://pub.dev/packages/google_fonts) (`Plus Jakarta Sans`, `Inter`, `JetBrains Mono`)
 - **Unique Identifiers**: `uuid: ^4.6.0`
 - **Date & Number Formatting**: `intl: ^0.20.3`
+
+---
+
+## 📐 Technical Architecture & Wire Pipeline
+
+HookDeck operates as an isolated, client-side dispatcher without intermediary proxies or cloud relays. Network payloads stream directly from the device sandbox to the target webhooks over TLS 1.3.
+
+### 1. Multi-Tier System Data Flow
+
+```mermaid
+flowchart TD
+    classDef client fill:#181614,stroke:#C59B6D,stroke-width:2px,color:#FFFFFF;
+    classDef engine fill:#161E19,stroke:#34A853,stroke-width:2px,color:#FFFFFF;
+    classDef storage fill:#151A24,stroke:#4285F4,stroke-width:2px,color:#FFFFFF;
+    classDef target fill:#211827,stroke:#9B51E0,stroke-width:2px,color:#FFFFFF;
+
+    subgraph PresentationTier["🖥️ PRESENTATION & INTERACTION TIER"]
+        UI["Studio Composer UI<br/><code>SendScreen & ProfilesHomeScreen</code>"]:::client
+        PREV["Live WYSIWYG Simulator<br/><code>LivePreviewCard (Discord / Slack)</code>"]:::client
+        TOAST["Haptic Telemetry Feedback<br/><code>AppFeedback Status Engine</code>"]:::client
+    end
+
+    subgraph StorageVault["📦 ISOLATED LOCAL STORAGE VAULT"]
+        SAF["Android Photo & File Picker<br/><code>Storage Access Framework (SAF)</code>"]:::storage
+        PREFS[("On-Device Sandboxed Store<br/><code>SharedPreferences (Identities & Webhooks)</code>")]:::storage
+    end
+
+    subgraph ProcessingEngine["⚙️ SERIALIZATION & BUFFER ENGINE"]
+        TRANS["Platform Protocol Serializer<br/><code>Discord JSON / Slack BlockKit / Generic</code>"]:::engine
+        BUFF["Resilient Multipart Streamer<br/><code>payload_json + files[0] (90s Timeout)</code>"]:::engine
+        BENCH["Round-Trip Telemetry Benchmarker<br/><code>Precision Stopwatch (ms) & Status Codes</code>"]:::engine
+    end
+
+    subgraph WebhookEndpoints["🌐 TLS 1.3 DIRECT HTTPS DISPATCH"]
+        DISCORD["Discord Gateway<br/><code>POST /api/webhooks/...</code>"]:::target
+        SLACK["Slack Ingestion API<br/><code>POST /services/hooks/...</code>"]:::target
+        REST["Generic HTTP Endpoints<br/><code>POST / PUT Custom REST API</code>"]:::target
+    end
+
+    UI -->|Render Persona & Formatting| PREV
+    SAF -.->|Stream Ephemeral Bytes| BUFF
+    PREFS <-->|Load Identities & Destinations| UI
+    UI -->|Trigger Dispatch| TRANS
+    TRANS -->|Structured Payload| BUFF
+    BUFF ==>|Direct TLS / HTTPS Wire| WebhookEndpoints
+    DISCORD -->|HTTP 204 No Content| BENCH
+    SLACK -->|HTTP 200 OK| BENCH
+    REST -->|HTTP 200 / 201| BENCH
+    BENCH -->|Record Telemetry Latency| PREFS
+    BENCH -->|Render Round-Trip Receipt| TOAST
+```
+
+### 2. Wire Dispatch Lifecycle Sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Dev as Developer / Operator
+    participant UI as HookDeck Studio
+    participant SAF as Scoped SAF Picker
+    participant Client as Multipart HTTP Client
+    participant Target as Destination Webhook
+    participant Audit as Local Telemetry Vault
+
+    Dev->>UI: Select Persona Identity (Avatar, Name, Tone)
+    Dev->>UI: Input Markdown Message Payload
+    opt Attach Media / Binary File
+        Dev->>UI: Tap "Attach File, Photo, or Log"
+        UI->>SAF: Request Ephemeral Access (No Broad Permissions)
+        SAF-->>UI: Stream Binary Byte Buffer
+    end
+    Dev->>UI: Tap "Dispatch Payload"
+    activate UI
+    UI->>Client: Construct Multipart Stream (payload_json + files[0])
+    activate Client
+    Client->>Client: Start Precision Microsecond Stopwatch
+    Client->>Target: Direct HTTPS POST Request (TLS 1.3, 90s Guard)
+    activate Target
+    Target-->>Client: Return Status (HTTP 204 No Content / 200 OK)
+    deactivate Target
+    Client->>Client: Stop Latency Clock (e.g. 799ms)
+    Client-->>UI: Return Response Code, Payload & Headers
+    deactivate Client
+    UI->>Audit: Persist Dispatch Receipt (Timestamp, Target, Latency)
+    UI-->>Dev: Display Floating Telemetry Card & Success Toast
+    deactivate UI
+```
+
+### 3. Dispatch Pipeline State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle: App Ready
+    Idle --> Composing: Select Identity & Destination
+    Composing --> Attaching: Tap Media Picker
+    Attaching --> Composing: Stream Bytes Ready
+    Composing --> Validating: Tap "Dispatch Payload"
+    
+    state Validating {
+        [*] --> CheckEndpoint
+        CheckEndpoint --> CheckContent
+        CheckContent --> Validated
+    }
+
+    Validating --> Streaming: Payload & Endpoint OK
+    Validating --> Composing: Validation Failed (Inline Notice)
+
+    state Streaming {
+        [*] --> BuildingMultipart
+        BuildingMultipart --> DirectHTTPSWire
+        DirectHTTPSWire --> AwaitingIngestion
+    }
+
+    Streaming --> DispatchSuccess: HTTP 200 / 204 (<1s)
+    Streaming --> DispatchError: HTTP 4xx / 5xx / Timeout
+
+    DispatchSuccess --> AuditLogged: Save Latency & Receipt
+    DispatchError --> AuditLogged: Save Error Telemetry
+    AuditLogged --> Idle: Ready for Next Dispatch
+```
 
 ---
 
