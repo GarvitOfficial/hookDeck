@@ -324,4 +324,4 @@ lib/
 
 ## 👤 Author
 
-**Garvit** ([@GarvitOfficial](https://github.com/GarvitOfficial))
+**GarvitOfficial** ([@GarvitOfficial](https://github.com/GarvitOfficial))

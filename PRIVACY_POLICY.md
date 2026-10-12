@@ -5,7 +5,7 @@
 **Application Name:** HookDeck: Webhook Sender  
 **Package Name:** `com.ownerofgmt.hookdeck`  
 **Developer:** OwnerOfGMT  
-**Contact:** [garvit@users.noreply.github.com](mailto:garvit@users.noreply.github.com)
+**Contact:** [68268393+GarvitOfficial@users.noreply.github.com](mailto:68268393+GarvitOfficial@users.noreply.github.com)
 
 ---
 
@@ -102,6 +102,6 @@ We may update this Privacy Policy periodically to reflect new features, operatio
 
 If you have any questions, concerns, or inquiries regarding this Privacy Policy or data privacy in HookDeck, please contact:
 
-* **Developer:** Garvit (OwnerOfGMT)
+* **Developer:** GarvitOfficial (OwnerOfGMT)
 * **GitHub:** [https://github.com/GarvitOfficial](https://github.com/GarvitOfficial)
-* **Email:** [garvit@users.noreply.github.com](mailto:garvit@users.noreply.github.com)
+* **Email:** [68268393+GarvitOfficial@users.noreply.github.com](mailto:68268393+GarvitOfficial@users.noreply.github.com)
