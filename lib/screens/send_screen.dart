@@ -13,6 +13,7 @@ import '../widgets/luxury_glass_card.dart';
 import '../widgets/luxury_button.dart';
 import '../widgets/glowing_avatar.dart';
 import '../widgets/destination_chip.dart';
+import '../widgets/app_feedback.dart';
 import 'send_success_screen.dart';
 import 'add_webhook_sheet.dart';
 
@@ -43,6 +44,7 @@ class _SendScreenState extends State<SendScreen> {
   int? _attachedFileSize;
   bool _silentDelivery = false;
   bool _isSending = false;
+  String? _validationError;
 
   @override
   void initState() {
@@ -51,6 +53,12 @@ class _SendScreenState extends State<SendScreen> {
     _selectedWebhook = widget.initialWebhook ??
         (widget.storageService.webhooks.where((w) => w.isFavorite).firstOrNull ??
             widget.storageService.webhooks.firstOrNull);
+
+    _messageController.addListener(() {
+      if (_validationError != null && _messageController.text.trim().isNotEmpty) {
+        setState(() => _validationError = null);
+      }
+    });
   }
 
   @override
@@ -295,15 +303,15 @@ class _SendScreenState extends State<SendScreen> {
           _attachedFileName = file.name;
           _attachedFileBytes = bytes;
           _attachedFileSize = size;
+          _validationError = null;
         });
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Could not open file: $e', style: GoogleFonts.plusJakartaSans()),
-            backgroundColor: const Color(0xFF1C1917),
-          ),
+        AppFeedback.show(
+          context,
+          message: 'Could not access file: $e',
+          isError: true,
         );
       }
     }
@@ -311,37 +319,40 @@ class _SendScreenState extends State<SendScreen> {
 
   Future<void> _handleSend() async {
     if (_selectedProfile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select or create a sender profile first!'),
-          backgroundColor: Color(0xFF1C1917),
-        ),
+      setState(() => _validationError = 'Please select or create a sender profile first.');
+      AppFeedback.show(
+        context,
+        message: 'Please select or create a sender profile first.',
+        isError: true,
       );
       return;
     }
 
     if (_selectedWebhook == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please connect a destination webhook first!'),
-          backgroundColor: Color(0xFF1C1917),
-        ),
+      setState(() => _validationError = 'Please connect a destination webhook first.');
+      AppFeedback.show(
+        context,
+        message: 'Please connect a destination webhook first.',
+        isError: true,
       );
       return;
     }
 
     final message = _messageController.text.trim();
     if (message.isEmpty && _attachedFileName == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please write a message or attach a file.'),
-          backgroundColor: Color(0xFF1C1917),
-        ),
+      setState(() => _validationError = 'Please type a message or select an attachment before dispatching.');
+      AppFeedback.show(
+        context,
+        message: 'Please type a message or select an attachment before dispatching.',
+        isError: true,
       );
       return;
     }
 
-    setState(() => _isSending = true);
+    setState(() {
+      _validationError = null;
+      _isSending = true;
+    });
     HapticFeedback.mediumImpact();
 
     final result = await WebhookService.send(
@@ -389,19 +400,15 @@ class _SendScreenState extends State<SendScreen> {
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Delivery error: ${result.errorMessage ?? 'Status ${result.statusCode}'}",
-              style: GoogleFonts.plusJakartaSans(),
-            ),
-            backgroundColor: const Color(0xFF1C1917),
-            behavior: SnackBarBehavior.floating,
-            action: SnackBarAction(
-              label: 'Retry',
-              textColor: AppTheme.bronzeGold,
-              onPressed: _handleSend,
-            ),
+        setState(() => _validationError = result.errorMessage ?? 'Destination returned HTTP ${result.statusCode}');
+        AppFeedback.show(
+          context,
+          message: "Delivery failed: ${result.errorMessage ?? 'Status ${result.statusCode}'}",
+          isError: true,
+          action: SnackBarAction(
+            label: 'Retry',
+            textColor: AppTheme.bronzeGold,
+            onPressed: _handleSend,
           ),
         );
       }
@@ -771,7 +778,45 @@ class _SendScreenState extends State<SendScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
+
+                // Inline validation / error notice
+                if (_validationError != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.subtleError.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: AppTheme.subtleError.withValues(alpha: 0.5),
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.warning_amber_rounded,
+                          size: 20,
+                          color: AppTheme.subtleError,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _validationError!,
+                            style: GoogleFonts.plusJakartaSans(
+                              color: const Color(0xFFF7F5F2),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
                 // 5. Send Webhook Button
                 LuxuryButton(
