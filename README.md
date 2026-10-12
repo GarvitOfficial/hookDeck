@@ -153,8 +153,12 @@ flutter run -d android
 ```
 
 #### Precompiled Release Artifacts
-* **Android Release APK**: Located in [dist/HookDeck-release.apk](dist/HookDeck-release.apk) (`52.4 MB`).
-* **Web Production Build**: Compiled in `build/web/`.
+* **Google Play Production Bundle (Signed AAB)**: [dist/HookDeck-release.aab](dist/HookDeck-release.aab) (`44.6 MB`)
+  * **Application ID / Package**: `com.ownerofgmt.hookdeck`
+  * **Play Store Name**: `HookDeck: Webhook Sender`
+  * **Signing Key Alias**: `upload` (RSA 2048-bit, Valid through 2054)
+* **Android Release Standalone APK**: [dist/HookDeck-release.apk](dist/HookDeck-release.apk) (`52.4 MB`)
+* **Web Production Build**: Compiled in `build/web/`
 
 ---
 

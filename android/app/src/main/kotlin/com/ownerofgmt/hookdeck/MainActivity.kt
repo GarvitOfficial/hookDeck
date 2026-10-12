@@ -1,4 +1,4 @@
-package com.hookdeck.app.hookdeck
+package com.ownerofgmt.hookdeck
 
 import io.flutter.embedding.android.FlutterActivity
 
