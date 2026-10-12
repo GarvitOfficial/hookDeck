@@ -6,7 +6,7 @@ import '../models/webhook_target.dart';
 import '../services/storage_service.dart';
 import '../services/webhook_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/luxury_button.dart';
+import '../widgets/tactile_button.dart';
 import '../widgets/destination_chip.dart';
 
 class AddWebhookSheet extends StatefulWidget {

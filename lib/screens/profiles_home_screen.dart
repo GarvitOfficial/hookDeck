@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/theme_provider.dart';
-import '../widgets/luxury_glass_card.dart';
+import '../widgets/glass_card.dart';
 import '../widgets/glowing_avatar.dart';
 import 'empty_state_view.dart';
 import 'create_profile_screen.dart';

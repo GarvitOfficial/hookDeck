@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class LuxuryButton extends StatefulWidget {
+class TactileButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
   final IconData? icon;
@@ -13,7 +13,7 @@ class LuxuryButton extends StatefulWidget {
   final Gradient? gradient;
   final Color? textColor;
 
-  const LuxuryButton({
+  const TactileButton({
     super.key,
     required this.text,
     required this.onPressed,
@@ -21,16 +21,18 @@ class LuxuryButton extends StatefulWidget {
     this.isLoading = false,
     this.isSecondary = false,
     this.height = 50,
-    this.borderRadius = 12, // Refined quiet luxury radius
+    this.borderRadius = 12,
     this.gradient,
     this.textColor,
   });
 
   @override
-  State<LuxuryButton> createState() => _LuxuryButtonState();
+  State<TactileButton> createState() => _TactileButtonState();
 }
 
-class _LuxuryButtonState extends State<LuxuryButton> {
+typedef LuxuryButton = TactileButton;
+
+class _TactileButtonState extends State<TactileButton> {
   bool _isPressed = false;
 
   @override

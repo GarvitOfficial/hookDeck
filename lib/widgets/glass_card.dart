@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LuxuryGlassCard extends StatelessWidget {
+class GlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
@@ -8,10 +8,10 @@ class LuxuryGlassCard extends StatelessWidget {
   final Color? customBgColor;
   final Color? borderColor;
   final VoidCallback? onTap;
-  final bool hasGlow; // Kept for API compatibility, renders subtle warm accent
+  final bool hasGlow;
   final Color? glowColor;
 
-  const LuxuryGlassCard({
+  const GlassCard({
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(18),
@@ -75,3 +75,5 @@ class LuxuryGlassCard extends StatelessWidget {
     return content;
   }
 }
+
+typedef LuxuryGlassCard = GlassCard;

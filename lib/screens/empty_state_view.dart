@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
-import '../widgets/luxury_glass_card.dart';
-import '../widgets/luxury_button.dart';
+import '../widgets/glass_card.dart';
+import '../widgets/tactile_button.dart';
 
 class EmptyStateView extends StatelessWidget {
   final VoidCallback onCreateProfile;

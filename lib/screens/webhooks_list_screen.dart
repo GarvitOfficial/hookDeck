@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/webhook_target.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/luxury_glass_card.dart';
+import '../widgets/glass_card.dart';
 import '../widgets/destination_chip.dart';
 import 'add_webhook_sheet.dart';
 import 'send_screen.dart';

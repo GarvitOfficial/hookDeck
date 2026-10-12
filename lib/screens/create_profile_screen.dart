@@ -5,8 +5,8 @@ import 'package:uuid/uuid.dart';
 import '../models/profile.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/luxury_glass_card.dart';
-import '../widgets/luxury_button.dart';
+import '../widgets/glass_card.dart';
+import '../widgets/tactile_button.dart';
 import '../widgets/glowing_avatar.dart';
 import '../widgets/live_preview_card.dart';
 

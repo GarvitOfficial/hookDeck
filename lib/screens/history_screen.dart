@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/luxury_glass_card.dart';
+import '../widgets/glass_card.dart';
 import '../widgets/destination_chip.dart';
 import '../widgets/glowing_avatar.dart';
 import 'send_success_screen.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'luxury_glass_card.dart';
+import 'glass_card.dart';
 import 'glowing_avatar.dart';
 
 class LivePreviewCard extends StatelessWidget {

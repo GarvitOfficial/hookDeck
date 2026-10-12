@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="screenshots/hookdeck_luxury_logo.jpg" alt="HookDeck Luxury Emblem" width="160" style="border-radius: 36px; box-shadow: 0 12px 36px rgba(0,0,0,0.4);" />
+  <img src="screenshots/hookdeck_crest_logo.jpg" alt="HookDeck Emblem" width="160" style="border-radius: 36px; box-shadow: 0 12px 36px rgba(0,0,0,0.4);" />
 </p>
 
-# HookDeck ✦ Quiet Luxury Webhook Dispatcher
+# HookDeck: Webhook Sender
 
 <p align="center">
-  <b>A bespoke, architectural mobile & web application for dispatching messages, media, and real binary file attachments through webhooks in 1–2 taps—without writing code.</b>
+  <b>A streamlined mobile & web workstation for dispatching messages, media, and binary file attachments through webhooks in 1–2 taps.</b>
 </p>
 
 <p align="center">
@@ -16,23 +16,23 @@
   <img src="https://img.shields.io/badge/Flutter-3.38.5-02569B?logo=flutter" alt="Flutter Version" />
   <img src="https://img.shields.io/badge/Dart-3.10+-0175C2?logo=dart" alt="Dart Version" />
   <img src="https://img.shields.io/badge/Android-Scoped_Storage_(SAF)-34A853?logo=android" alt="Scoped Storage" />
-  <img src="https://img.shields.io/badge/Style-Quiet_Luxury-8C5E38" alt="Design Style" />
+  <img src="https://img.shields.io/badge/Style-Minimalist_Dark-8C5E38" alt="Design Style" />
   <img src="https://img.shields.io/badge/Platforms-Android_|_Web_|_iOS-black" alt="Platforms" />
   <img src="https://img.shields.io/badge/Author-GarvitOfficial-C59B6D" alt="Author" />
 </p>
 
 ---
 
-## 🏛 Design Philosophy: Quiet Luxury & Minimalist Dispatch
+## 🏛 Design Philosophy: Clean Focus & Minimalist Dispatch
 
-HookDeck delivers an editorial, high-end experience crafted around calm focus and zero AI clutter:
+HookDeck delivers an intentional, distraction-free experience crafted around rapid dispatching:
 
-- **Bespoke Luxury Crest**: The signature gold HookDeck crest emblem is integrated seamlessly across the navigation bar, identity headers, onboarding states, and launcher icons.
+- **Signature HookDeck Emblem**: Integrated seamlessly across the navigation bar, identity headers, onboarding states, and app icons.
 - **Harmonious Dual Themes**: 
   - **Espresso Noir (Dark)**: Smoked obsidian backdrops (`#0F0E0D`), hairline bronze borders (`#C59B6D33`), and warm muted cards.
   - **Alabaster Ivory (Light)**: Pure silk ivory linen surfaces with warm saddle brown typography and accents.
 - **Editorial Typography**: Pairing `Plus Jakarta Sans` for brand headings, `Inter` for clean prose, and `JetBrains Mono` for masked tokens and latency telemetry.
-- **Genuine Identity Ownership**: No forced generic emojis. Users can link custom avatar image URLs (e.g. Unsplash, GitHub, internal CDNs), choose luxury monogram accents, or display the HookDeck crest.
+- **Genuine Identity Ownership**: No forced generic emojis. Users can link custom avatar image URLs (e.g. Unsplash, GitHub, internal CDNs), choose custom monogram accents, or display the HookDeck emblem.
 
 ---
 
@@ -45,7 +45,7 @@ Create and manage custom sender identities with real custom image URLs and live 
 | 1. Profiles Home Screen | 2. Identity Creator & Live Preview |
 |:---:|:---:|
 | <img src="screenshots/01_hookdeck_profiles_l.png" width="340" /> | <img src="screenshots/05_hookdeck_create_profile_l.png" width="340" /> |
-| *Active identity cards featuring profile `L` with custom Unsplash avatar and 1-tap dispatch* | *Identity creator with live destination preview card and luxury tone swatches* |
+| *Active identity cards featuring profile `L` with custom Unsplash avatar and 1-tap dispatch* | *Identity creator with live destination preview card and customizable tone swatches* |
 
 ---
 
@@ -126,8 +126,8 @@ Dispatch messages and real device attachments with zero clutter, clean empty sta
 
 ```bash
 # Clone the repository
-git clone https://github.com/GarvitOfficial/dcWebhook.git
-cd dcWebhook
+git clone https://github.com/GarvitOfficial/hookDeck.git
+cd hookDeck
 
 # Install dependencies
 flutter pub get
@@ -184,20 +184,20 @@ lib/
 │   ├── webhooks_list_screen.dart  # Endpoint manager with search & filter chips
 │   ├── add_webhook_sheet.dart     # Auto-detecting endpoint connection modal
 │   ├── history_screen.dart        # Audit trail of sent dispatches
-│   └── empty_state_view.dart      # Minimalist onboarding screen with luxury crest
+│   └── empty_state_view.dart      # Minimalist onboarding screen with emblem
 ├── services/
 │   ├── storage_service.dart       # SharedPreferences persistence & demo seed data
 │   └── webhook_service.dart       # Multipart streaming HTTP client with Discord/Slack transformers
 ├── theme/
-│   ├── app_theme.dart             # Luxury design tokens (Espresso Noir & Alabaster Ivory)
+│   ├── app_theme.dart             # Refined design tokens (Espresso Noir & Alabaster Ivory)
 │   └── theme_provider.dart        # Reactive light/dark theme switcher
 └── widgets/
-    ├── app_feedback.dart          # Floating high-contrast luxury toast system
+    ├── app_feedback.dart          # Floating high-contrast status toast system
     ├── destination_chip.dart      # Platform badge (Discord, Slack, Generic)
     ├── glowing_avatar.dart        # Network image avatar with monogram fallback
     ├── live_preview_card.dart     # Discord/Slack simulation card
-    ├── luxury_button.dart         # Weighted pill CTA button with haptic feedback
-    └── luxury_glass_card.dart     # Hairline border minimalist container
+    ├── tactile_button.dart        # Tactile pill CTA button with haptic feedback
+    └── glass_card.dart            # Hairline border obsidian container
 ```
 
 ---
