@@ -4,7 +4,7 @@
 **Effective date:** October 12, 2026  
 **Application Name:** HookDeck: Webhook Sender  
 **Package Name:** `com.ownerofgmt.hookdeck`  
-**Developer:** OwnerOfGMT / GarvitOfficial  
+**Developer:** OwnerOfGMT  
 **Contact:** [garvit@users.noreply.github.com](mailto:garvit@users.noreply.github.com)
 
 ---

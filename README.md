@@ -15,7 +15,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.38.5-02569B?logo=flutter" alt="Flutter Version" />
   <img src="https://img.shields.io/badge/Dart-3.10+-0175C2?logo=dart" alt="Dart Version" />
-  <img src="https://img.shields.io/badge/Play_Store-100%25_Compliant_(SAF)-34A853?logo=googleplay" alt="Play Store Compliant" />
+  <img src="https://img.shields.io/badge/Android-Scoped_Storage_(SAF)-34A853?logo=android" alt="Scoped Storage" />
   <img src="https://img.shields.io/badge/Style-Quiet_Luxury-8C5E38" alt="Design Style" />
   <img src="https://img.shields.io/badge/Platforms-Android_|_Web_|_iOS-black" alt="Platforms" />
   <img src="https://img.shields.io/badge/Author-GarvitOfficial-C59B6D" alt="Author" />
@@ -88,10 +88,10 @@ Dispatch messages and real device attachments with zero clutter, clean empty sta
   - Uploads real binary bytes to Discord channels using standard `payload_json` + `files[0]` multipart format.
   - Generous 90-second streaming timeout ensures high-resolution images and large logs upload without false timeout warnings.
   - Dynamic button progress: shows **`Uploading & Dispatching...`** while transferring files.
-- **🛡️ Google Play Console Policy Compliant**:
-  - **Zero Broad Storage Permissions**: Neither `READ_EXTERNAL_STORAGE` nor `MANAGE_EXTERNAL_STORAGE` is requested in `AndroidManifest.xml`.
-  - Exclusively uses Android's **Storage Access Framework (SAF)** / system photo picker for safe, ephemeral read access.
-  - Fully compliant with Google Play's updated **Photo and Video Permissions Policy**.
+- **🛡️ Modern Scoped Storage & Security**:
+  - **Zero Invasive Storage Permissions**: Neither `READ_EXTERNAL_STORAGE` nor `MANAGE_EXTERNAL_STORAGE` is requested.
+  - Exclusively uses native **Storage Access Framework (SAF)** / system photo picker for ephemeral user-selected file reads.
+  - Client-side isolated direct transmission over TLS/HTTPS.
 - **🔔 Floating Feedback & Inline Validation**:
   - High-contrast floating toasts ([AppFeedback](file:///Users/ganu/Programming/dcWebhook/lib/widgets/app_feedback.dart)) with glowing status icons.
   - Inline error notice directly above the dispatch button ensures clear visibility on all viewport heights.
@@ -152,13 +152,17 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 flutter run -d android
 ```
 
-#### Precompiled Release Artifacts
-* **Google Play Production Bundle (Signed AAB)**: [dist/HookDeck-release.aab](dist/HookDeck-release.aab) (`44.6 MB`)
-  * **Application ID / Package**: `com.ownerofgmt.hookdeck`
-  * **Play Store Name**: `HookDeck: Webhook Sender`
-  * **Signing Key Alias**: `upload` (RSA 2048-bit, Valid through 2054)
-* **Android Release Standalone APK**: [dist/HookDeck-release.apk](dist/HookDeck-release.apk) (`52.4 MB`)
-* **Web Production Build**: Compiled in `build/web/`
+#### Build Production Artifacts
+```bash
+# Build Android APK:
+flutter build apk --release
+
+# Build Android App Bundle:
+flutter build appbundle --release
+
+# Build Web Bundle:
+flutter build web --release
+```
 
 ---
 

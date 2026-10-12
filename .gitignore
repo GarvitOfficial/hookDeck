@@ -49,3 +49,13 @@ app.*.map.json
 *.keystore
 *.key
 key.properties
+android/key.properties
+android/app/key.properties
+
+# Build artifacts & binaries
+/dist/
+*.apk
+*.aab
+
+# Internal store submission metadata
+PLAY_STORE_METADATA.md
