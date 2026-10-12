@@ -5,7 +5,7 @@
 **Application Name:** HookDeck: Webhook Sender  
 **Package Name:** `com.ownerofgmt.hookdeck`  
 **Developer:** OwnerOfGMT  
-**Contact:** [68268393+GarvitOfficial@users.noreply.github.com](mailto:68268393+GarvitOfficial@users.noreply.github.com)
+**Contact:** ownerofgmt.products@gmail.com
 
 ---
 
